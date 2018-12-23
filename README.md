@@ -1,2 +1,2 @@
-# 1ADS-MP2
-Supinfo A.Sc.1 Python Mini Project 2
+# SOS Game
+## 1ADS MP2 / Supinfo A.Sc.1 Project
