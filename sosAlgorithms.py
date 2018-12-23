@@ -9,7 +9,7 @@ def newBoard(n):
     :param n: Nombre de lignes et de colonnes du tableau de jeu
     :return: Tableau de jeu
     """
-    pass
+    return [[0]*n]*n
 
 
 def possibleSquare(board, n, i, j):
