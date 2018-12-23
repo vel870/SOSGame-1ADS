@@ -13,6 +13,7 @@ def newBoard(n):
 
 
 def possibleSquare(board, n, i, j):
+    git kraken c tro ienb
     """
     Retourne True si (i, j) sont les coordonnées d'une case où un joueur peut poser une lettre
     :param board: Tableau de jeu
