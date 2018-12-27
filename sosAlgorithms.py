@@ -53,7 +53,30 @@ def updateScoreO(board, n, i, j, scores, player, lines):
     :param lines: Tableau des nouvelles lignes
     :return: (scores, lines)
     """
-    pass
+
+    """
+    Tableau contenant toutes les combinaisons possibles de combinaisons après avoir posé un O. 
+    Chaque combinaison comprends les coordonnées relatives des deux "S" potentiels
+    """
+    cellsToCheck = [
+        [[i, j-1], [i, j+1]],
+        [[i-1, j-1], [i+1, j+1]],
+        [[i-1, j], [i+1, j]],
+        [[i-1, j+1], [i+1, j-1]]
+    ]
+
+    for cells in cellsToCheck:
+
+        # On vérifie si les coordonnées calculées sont sur le plateau
+        if isCellOnBoard(n, cells[0][0], cells[0][1]) and isCellOnBoard(n, cells[1][0], cells[1][0]):
+
+            # On incrémente le score si les deux cases sont bien des S
+            if board[cells[0][0]][cells[0][1]] == 1 and board[cells[1][0]][cells[1][1]] == 1:
+
+                lines += cells
+                scores[player] += 1
+
+    return scores, lines
 
 
 def update(board, n, i, j, l, scores, player, lines):
