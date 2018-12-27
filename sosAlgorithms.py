@@ -86,6 +86,20 @@ def won(board):
     return True
 
 
+def isCellOnBoard(n, i, j):
+    """
+    Vérifie la présence de la case (i,j) sur le plateau de taille n
+    :param n: Taille du tableau de jeu
+    :param i: Ligne de la case
+    :param j: Colonne de la case
+    :return: bool
+    """
+    if i in range(0, n) and j in range(0, n):
+        return True
+
+    return False
+
+
 def togglePlayer(player):
     """
     Toggle player
