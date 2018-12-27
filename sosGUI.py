@@ -51,8 +51,8 @@ def drawCell(mySurface, board, i, j, player):
     Dessine le contenu de la case (i,j) de la couleur de player
     :param mySurface: Surface pyGame
     :param board: Tableau de jeu
-    :param i:
-    :param j:
+    :param i: Ligne de la case
+    :param j: Colonne de la case
     :param player: Joueur en cours
     :return: True si succès, False sinon
     """
