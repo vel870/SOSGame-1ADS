@@ -2,6 +2,17 @@
 # 1 ADS - MP 2 - SUPINFO
 ########################
 
+import pygame
+from pygame.locals import *
+from sosAlgorithms import *
+
+
+WINDOW_width = 900
+WINDOW_height = 600
+
+COLOR_black = (0, 0, 0)
+COLOR_white = (255, 255, 255)
+
 
 def drawBoard(mySurface, n):
     """
@@ -78,7 +89,7 @@ def selectSquare(mySurface, board, n):
     :param n: Taille du tableau de jeu
     :return: (i, j, l)
     """
-    pass
+    return 0, 0, 0
 
 
 def gamePlay(mySurface, board, n, scores):
@@ -87,10 +98,24 @@ def gamePlay(mySurface, board, n, scores):
     :param mySurface: Surface pyGame
     :param board: Tableau de jeu
     :param n: Taille du tableau de jeu
-    :param scores:
+    :param scores: Tableau des scores
     :return:
     """
-    pass
+    playing = 1
+    player = 0
+
+    while playing:
+
+        while not won(board):
+
+            i, j, l = selectSquare(mySurface, board, n)
+
+            drawCell(mySurface, board, i, j, player)
+            scores, lines = update(board, n, i, j, l, scores, player, [])
+            drawLines(mySurface, lines, player)
+            displayScore(mySurface, n, scores)
+
+        displayWinner(mySurface, n, scores)
 
 
 def SOS(n):
@@ -99,4 +124,15 @@ def SOS(n):
     :param n: Taille du tableau de jeu
     :return:
     """
-    pass
+
+    n = 6
+    board = newBoard(n)
+    scores = [0, 0]
+
+    mySurface = pygame.display.set_mode((WINDOW_width, WINDOW_height))
+    pygame.display.set_caption('SOS Game')
+
+    gamePlay(mySurface, board, n, scores)
+
+
+SOS(6)

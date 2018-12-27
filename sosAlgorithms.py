@@ -9,7 +9,7 @@ def newBoard(n):
     :param n: Nombre de lignes et de colonnes du tableau de jeu
     :return: Tableau de jeu
     """
-    pass
+    return [[0]*n]*n
 
 
 def possibleSquare(board, n, i, j):
@@ -72,6 +72,28 @@ def update(board, n, i, j, l, scores, player, lines):
     :return:
     """
     pass
+
+
+def won(board):
+    """
+    :param board: Tableau de jeu
+    :return: True si un joueur a gagné, False sinon
+    """
+    for i in board:
+        for j in i:
+            if j == 0:
+                return False
+
+    return True
+
+
+def togglePlayer(player):
+    """
+    Toggle player
+    :param player: actual player
+    :return: new player
+    """
+    return 1 if not player else 0
 
 
 def winner(scores):
