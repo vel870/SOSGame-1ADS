@@ -21,12 +21,11 @@ def possibleSquare(board, n, i, j):
     :param j:
     :return: True | False
     """
-    for x in range(0, n):
-        for y in range(0, n):
-            if board[i][j] == 0:
-                return True
-            else:
-                return False
+    if 0 < i < n and 0 < j < n:
+        if board[i][j] == 0:
+            return True
+        else:
+            return False
 
 
 def updateScoreS(board, n, i, j, scores, player, lines):
@@ -105,5 +104,9 @@ def winner(scores):
     :param scores: Tableau des scores
     :return: Chaîne de caractère indiquant le résultat de la partie
     """
-    if won(board):
-        return scores
+    if scores[0] > scores[1]:
+        return " le joueur 1 a gagné ! "
+    elif scores[0] < scores[1]:
+        return " le joueur 2 a gagné ! "
+    else:
+        return " Il y a égalité entre les joueurs ! "
