@@ -51,8 +51,8 @@ def drawCell(mySurface, board, i, j, player):
     Dessine le contenu de la case (i,j) de la couleur de player
     :param mySurface: Surface pyGame
     :param board: Tableau de jeu
-    :param i:
-    :param j:
+    :param i: Ligne de la case
+    :param j: Colonne de la case
     :param player: Joueur en cours
     :return: True si succès, False sinon
     """
@@ -109,9 +109,10 @@ def gamePlay(mySurface, board, n, scores):
         while not won(board):
 
             i, j, l = selectSquare(mySurface, board, n)
+            lines = []
 
             drawCell(mySurface, board, i, j, player)
-            scores, lines = update(board, n, i, j, l, scores, player, [])
+            board, scores, lines = update(board, n, i, j, l, scores, player, lines)
             drawLines(mySurface, lines, player)
             displayScore(mySurface, n, scores)
 
