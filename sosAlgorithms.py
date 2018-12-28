@@ -121,9 +121,16 @@ def update(board, n, i, j, l, scores, player, lines):
     :param scores: Tableau des scores
     :param player: Joueur en cours
     :param lines: Tableau des nouvelles lignes
-    :return:
+    :return: board, scores, lines
     """
-    pass
+    board[i][j] = l
+
+    if l == 1:
+        scores, lines = updateScoreS(board, n, i, j, scores, player, lines)
+    else:
+        scores, lines = updateScoreO(board, n, i, j, scores, player, lines)
+
+    return board, scores, lines
 
 
 def won(board):

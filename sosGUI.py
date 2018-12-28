@@ -109,9 +109,10 @@ def gamePlay(mySurface, board, n, scores):
         while not won(board):
 
             i, j, l = selectSquare(mySurface, board, n)
+            lines = []
 
             drawCell(mySurface, board, i, j, player)
-            scores, lines = update(board, n, i, j, l, scores, player, [])
+            board, scores, lines = update(board, n, i, j, l, scores, player, lines)
             drawLines(mySurface, lines, player)
             displayScore(mySurface, n, scores)
 
