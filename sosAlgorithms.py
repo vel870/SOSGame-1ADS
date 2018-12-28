@@ -13,7 +13,6 @@ def newBoard(n):
 
 
 def possibleSquare(board, n, i, j):
-    git kraken c tro ienb
     """
     Retourne True si (i, j) sont les coordonnées d'une case où un joueur peut poser une lettre
     :param board: Tableau de jeu
@@ -22,7 +21,12 @@ def possibleSquare(board, n, i, j):
     :param j:
     :return: True | False
     """
-    pass
+    for x in range(0, n):
+        for y in range(0, n):
+            if board[i][j] == 0:
+                return True
+            else:
+                return False
 
 
 def updateScoreS(board, n, i, j, scores, player, lines):
@@ -101,4 +105,5 @@ def winner(scores):
     :param scores: Tableau des scores
     :return: Chaîne de caractère indiquant le résultat de la partie
     """
-    pass
+    if won(board):
+        return scores
