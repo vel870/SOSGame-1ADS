@@ -11,10 +11,16 @@ from sosLauncher import *
 WINDOW_width = 900
 WINDOW_height = 700
 
-COLOR_black = [0, 0, 0]
-COLOR_white = [255, 255, 255]
-COLOR_blue = [3, 146, 207]
-COLOR_red = [251, 46, 1]
+Black = (0, 0, 0)
+White = (255, 255, 255)
+Red = (255, 0, 0)
+Green = (0, 255, 0)
+Blue = (0, 0, 255)
+Blue0 = (36, 103, 141)
+Blue1 = (36, 48, 81)
+Blue2 = (194, 204, 231)
+Red0 = (206, 25, 25)
+Green0 = (49, 175, 73)
 
 def drawBoard(mySurface, n):
     """
@@ -26,47 +32,64 @@ def drawBoard(mySurface, n):
 
     FONT_base = pygame.font.Font('freesansbold.ttf', 25)
 
-    mySurface.fill(COLOR_blue)
+    mySurface.fill(Blue0)
 
-    #pygame.draw.rect(mySurface, COLOR_blue, GameMenu)
-    button_gamemenu = FONT_base.render("Game Menu", 1, COLOR_blue)
+    GameMenu = pygame.Rect(50, 75, 180, 50)
+    NewGame = pygame.Rect(50, 150, 180, 50)
+    QuitGame = pygame.Rect(50, 225, 180, 50)
+    ScoreS = pygame.Rect(50, 375, 180, 50)
+    ScoreO = pygame.Rect(50, 450, 180, 50)
+
+    pygame.draw.rect(mySurface, Blue1, GameMenu)
+    button_gamemenu = FONT_base.render("Game Menu", 1, Blue2)
     mySurface.blit(button_gamemenu, (60, 85))
 
-    #pygame.draw.rect(mySurface, COLOR_blue, NewGame)
-    button_newgame = FONT_base.render("New Game", 1, COLOR_blue)
+    pygame.draw.rect(mySurface, Blue1, NewGame)
+    button_newgame = FONT_base.render("New Game", 1, Blue2)
     mySurface.blit(button_newgame, (65, 162))
 
-    #pygame.draw.rect(mySurface, COLOR_blue, QuitGame)
-    button_quitgame = FONT_base.render("Quit Game", 1, COLOR_blue)
+    pygame.draw.rect(mySurface, Blue1, QuitGame)
+    button_quitgame = FONT_base.render("Quit Game", 1, Blue2)
     mySurface.blit(button_quitgame, (65, 237))
 
-    #pygame.draw.rect(mySurface, COLOR_blue, ScoreS)
-    label_score_s = FONT_base.render("S Score", 1, COLOR_red)
+    pygame.draw.rect(mySurface, Blue1, ScoreS)
+    label_score_s = FONT_base.render("S Score", 1, Blue2)
     mySurface.blit(label_score_s, (90, 387))
 
-    #pygame.draw.rect(mySurface, COLOR_blue, ScoreO)
-    label_score_o = FONT_base.render("O Score", 1, COLOR_red)
+    pygame.draw.rect(mySurface, Blue1, ScoreO)
+    label_score_o = FONT_base.render("O Score", 1, Blue2)
     mySurface.blit(label_score_o, (90, 462))
 
     width = 75
     x, y = 250, 75
 
+    cells = []
+
     for row in range(0, n):
         for col in range(0, n):
 
-            case_background = pygame.Rect(x, y, width, width)
-            case_text = FONT_base.render("S/O", 1, COLOR_red)
+            cell_background = pygame.Rect(x, y, width, width)
+            cell_text = FONT_base.render("S/O", 1, Red0)
 
-            pygame.draw.rect(mySurface, COLOR_white, case_background)
-            mySurface.blit(case_text, (x + 15, y + 25))
+            pygame.draw.rect(mySurface, White, cell_background)
+            mySurface.blit(cell_text, (x + 15, y + 25))
 
             x = x + width  # Déplacement à droite
+
+            cells.append({
+                'x': row,
+                'y': col,
+                'rect': cell_background
+            })
 
         y = y + width  # Déplacement en bas
         x = 250  # Retour au côté gauche
 
     pygame.display.flip()
-    return True
+
+    return {
+        'cells': cells
+    }
 
 
 def displayScore(mySurface, n, scores):
@@ -150,7 +173,8 @@ def gamePlay(mySurface, board, n, scores):
     player = 0
     clock = pygame.time.Clock()
 
-    drawBoard(mySurface, n)
+    rects = drawBoard(mySurface, n)
+
     """
     i, j, l = selectSquare(mySurface, board, n)
     lines = []
@@ -168,9 +192,12 @@ def gamePlay(mySurface, board, n, scores):
             if event.type == pygame.QUIT:
                 return 0
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                pass
 
-        clock.tick(30)
+                for cell in rects['cells']:
+                    if cell['rect'].collidepoint(event.pos):
+                        print('Cell clicked at x ='+str(cell['x'])+' and y ='+str(cell['y']))
+
+        clock.tick(60)
 
 
 def SOS(n):
