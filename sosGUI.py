@@ -4,15 +4,17 @@
 
 import pygame
 from pygame.locals import *
-from sosAlgorithms import *
 
+from sosAlgorithms import *
+from sosLauncher import *
 
 WINDOW_width = 900
-WINDOW_height = 600
+WINDOW_height = 700
 
-COLOR_black = (0, 0, 0)
-COLOR_white = (255, 255, 255)
-
+COLOR_black = [0, 0, 0]
+COLOR_white = [255, 255, 255]
+COLOR_blue = [3, 146, 207]
+COLOR_red = [251, 46, 1]
 
 def drawBoard(mySurface, n):
     """
@@ -21,7 +23,50 @@ def drawBoard(mySurface, n):
     :param n: Taille du tableau de jeu
     :return: True si succès, False sinon
     """
-    pass
+
+    FONT_base = pygame.font.Font('freesansbold.ttf', 25)
+
+    mySurface.fill(COLOR_blue)
+
+    #pygame.draw.rect(mySurface, COLOR_blue, GameMenu)
+    button_gamemenu = FONT_base.render("Game Menu", 1, COLOR_blue)
+    mySurface.blit(button_gamemenu, (60, 85))
+
+    #pygame.draw.rect(mySurface, COLOR_blue, NewGame)
+    button_newgame = FONT_base.render("New Game", 1, COLOR_blue)
+    mySurface.blit(button_newgame, (65, 162))
+
+    #pygame.draw.rect(mySurface, COLOR_blue, QuitGame)
+    button_quitgame = FONT_base.render("Quit Game", 1, COLOR_blue)
+    mySurface.blit(button_quitgame, (65, 237))
+
+    #pygame.draw.rect(mySurface, COLOR_blue, ScoreS)
+    label_score_s = FONT_base.render("S Score", 1, COLOR_red)
+    mySurface.blit(label_score_s, (90, 387))
+
+    #pygame.draw.rect(mySurface, COLOR_blue, ScoreO)
+    label_score_o = FONT_base.render("O Score", 1, COLOR_red)
+    mySurface.blit(label_score_o, (90, 462))
+
+    width = 75
+    x, y = 250, 75
+
+    for row in range(0, n):
+        for col in range(0, n):
+
+            case_background = pygame.Rect(x, y, width, width)
+            case_text = FONT_base.render("S/O", 1, COLOR_red)
+
+            pygame.draw.rect(mySurface, COLOR_white, case_background)
+            mySurface.blit(case_text, (x + 15, y + 25))
+
+            x = x + width  # Déplacement à droite
+
+        y = y + width  # Déplacement en bas
+        x = 250  # Retour au côté gauche
+
+    pygame.display.flip()
+    return True
 
 
 def displayScore(mySurface, n, scores):
