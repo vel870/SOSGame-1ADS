@@ -103,20 +103,29 @@ def gamePlay(mySurface, board, n, scores):
     """
     playing = 1
     player = 0
+    clock = pygame.time.Clock()
+
+    drawBoard(mySurface, n)
+    """
+    i, j, l = selectSquare(mySurface, board, n)
+    lines = []
+
+    drawCell(mySurface, board, i, j, player)
+    board, scores, lines = update(board, n, i, j, l, scores, player, lines)
+    drawLines(mySurface, lines, player)
+    displayScore(mySurface, n, scores)
+    """
 
     while playing:
 
-        while not won(board):
+        for event in pygame.event.get():
 
-            i, j, l = selectSquare(mySurface, board, n)
-            lines = []
+            if event.type == pygame.QUIT:
+                return 0
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pass
 
-            drawCell(mySurface, board, i, j, player)
-            board, scores, lines = update(board, n, i, j, l, scores, player, lines)
-            drawLines(mySurface, lines, player)
-            displayScore(mySurface, n, scores)
-
-        displayWinner(mySurface, n, scores)
+        clock.tick(30)
 
 
 def SOS(n):
@@ -125,15 +134,26 @@ def SOS(n):
     :param n: Taille du tableau de jeu
     :return:
     """
+    gameState = 1
 
-    n = 6
     board = newBoard(n)
     scores = [0, 0]
+
+    pygame.init()
+    pygame.font.init()
 
     mySurface = pygame.display.set_mode((WINDOW_width, WINDOW_height))
     pygame.display.set_caption('SOS Game')
 
-    gamePlay(mySurface, board, n, scores)
+    while gameState != 0:
+
+        if gameState == 1:
+            print('Lancher...')
+            gameState = launcher(mySurface)
+
+        elif gameState == 2:
+            print('Game...')
+            gameState = gamePlay(mySurface, board, n, scores)
 
 
-SOS(6)
+SOS(7)
