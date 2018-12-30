@@ -3,6 +3,11 @@ from pygame.locals import *
 
 
 def launcher(mySurface):
+    """
+    Affiche et gère le menu principal
+    :param mySurface: Surface pyGame
+    :return: Nouveau gamestate
+    """
 
     playing = 1
     clock = pygame.time.Clock()

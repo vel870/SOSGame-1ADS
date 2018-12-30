@@ -9,6 +9,7 @@ def newBoard(n):
     :param n: Nombre de lignes et de colonnes du tableau de jeu
     :return: Tableau de jeu
     """
+    # TODO Rewrite
     board = []
     for i in range(0, n):
         board_line = []
@@ -55,26 +56,26 @@ def updateScoreS(board, n, i, j, scores, player, lines):
     Les coordonnées sont relatives à celles du S qui vient d'être posé
     """
     cellsToCheck = [
-        [[i-2, j-2], [i-1, j-1]],
-        [[i-2, j], [i-1, j]],
-        [[i-2, j+2], [i-1, j+1]],
-        [[i, j-2], [i, j-1]],
-        [[i, j+2], [i, j+1]],
-        [[i+2, j-2], [i+1, j-1]],
-        [[i+2, j], [i+1, j]],
-        [[i+2, j+2], [i+1, j+1]],
+        [(i-2, j-2), (i-1, j-1)],
+        [(i-2, j), (i-1, j)],
+        [(i-2, j+2), (i-1, j+1)],
+        [(i, j-2), (i, j-1)],
+        [(i, j+2), (i, j+1)],
+        [(i+2, j-2), (i+1, j-1)],
+        [(i+2, j), (i+1, j)],
+        [(i+2, j+2), (i+1, j+1)],
     ]
 
     for cells in cellsToCheck:
 
         # On vérifie si les coordonnées calculées sont sur le plateau
-        if isCellOnBoard(n, cells[0][0], cells[0][1]) and isCellOnBoard(n, cells[1][0], cells[1][0]):
+        if isCellOnBoard(n, cells[0][0], cells[0][1]) and isCellOnBoard(n, cells[1][0], cells[1][1]):
 
             # On incrémente le score si on a bien un S dans cells[0] et un O dans cells[1]
             if board[cells[0][0]][cells[0][1]] == 1 and board[cells[1][0]][cells[1][1]] == 2:
 
                 # On ajoute une ligne entre les deux "S"
-                lines += [[i, j], cells[0]]
+                lines.append([(i, j), cells[0]])
                 scores[player] += 1
 
     return scores, lines
@@ -100,21 +101,21 @@ def updateScoreO(board, n, i, j, scores, player, lines):
     Chaque combinaison comprends les coordonnées relatives des deux "S" potentiellement déjà sur le plateau.
     """
     cellsToCheck = [
-        [[i, j-1], [i, j+1]],
-        [[i-1, j-1], [i+1, j+1]],
-        [[i-1, j], [i+1, j]],
-        [[i-1, j+1], [i+1, j-1]]
+        [(i, j-1), (i, j+1)],
+        [(i-1, j-1), (i+1, j+1)],
+        [(i-1, j), (i+1, j)],
+        [(i-1, j+1), (i+1, j-1)]
     ]
 
     for cells in cellsToCheck:
 
         # On vérifie si les coordonnées calculées sont sur le plateau
-        if isCellOnBoard(n, cells[0][0], cells[0][1]) and isCellOnBoard(n, cells[1][0], cells[1][0]):
+        if isCellOnBoard(n, cells[0][0], cells[0][1]) and isCellOnBoard(n, cells[1][0], cells[1][1]):
 
             # On incrémente le score si les deux cases sont bien des S
             if board[cells[0][0]][cells[0][1]] == 1 and board[cells[1][0]][cells[1][1]] == 1:
 
-                lines += cells
+                lines.append(cells)
                 scores[player] += 1
 
     return scores, lines
@@ -136,10 +137,10 @@ def update(board, n, i, j, l, scores, player, lines):
     """
     board[i][j] = l
 
-    # if l == 1:
-        # scores, lines = updateScoreS(board, n, i, j, scores, player, lines)
-    # else:
-        # scores, lines = updateScoreO(board, n, i, j, scores, player, lines)
+    if l == 1:
+        scores, lines = updateScoreS(board, n, i, j, scores, player, lines)
+    else:
+        scores, lines = updateScoreO(board, n, i, j, scores, player, lines)
 
     return board, scores, lines
 
