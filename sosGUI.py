@@ -186,22 +186,27 @@ def gamePlay(mySurface, board, n, scores):
                     for cell in rects['cells']:
                         if cell['rect'].collidepoint(event.pos):
 
-                            if event.button == 1:
-                                l = 1
-                            elif event.button == 3:
-                                l = 2
-                            else:
-                                break
-
                             i = cell['x']
                             j = cell['y']
 
-                            lines = []
+                            if board[i][j] == 0:
 
-                            drawCell(mySurface, board, i, j, player)
-                            board, scores, lines = update(board, n, i, j, l, scores, player, lines)
-                            drawLines(mySurface, lines, player)
-                            displayScore(mySurface, n, scores)
+                                if event.button == 1:
+                                    l = 1
+                                elif event.button == 3:
+                                    l = 2
+                                else:
+                                    break
+
+                                lines = []
+
+                                board, scores, lines = update(board, n, i, j, l, scores, player, lines)
+
+                                drawCell(mySurface, board, i, j, player)
+                                drawLines(mySurface, lines, player)
+                                displayScore(mySurface, n, scores)
+
+                                player = togglePlayer(player)
 
         clock.tick(60)
     return 0
