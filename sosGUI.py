@@ -71,7 +71,7 @@ def drawBoard(mySurface, n):
             cell_background = pygame.Rect(x, y, width, width)
             cell_text = FONT_base.render("S/O", 1, Red0)
 
-            pygame.draw.rect(mySurface, White, cell_background)
+            pygame.draw.rect(mySurface, Blue1, cell_background, 5)
             mySurface.blit(cell_text, (x + 15, y + 25))
 
             x = x + width  # Déplacement à droite
@@ -93,6 +93,7 @@ def drawBoard(mySurface, n):
         'mainMenu': GameMenu,
         'cells': cells
     }
+
 
 
 def displayScore(mySurface, n, scores):
@@ -127,8 +128,27 @@ def drawCell(mySurface, board, i, j, player):
     :param player: Joueur en cours
     :return: True si succès, False sinon
     """
-    pass
+    x = 255 + 75 * i
+    y = 80 + 75 * j
 
+    FONT_base = pygame.font.Font('freesansbold.ttf', 25)
+
+    if board[i][j] == 1:
+        cell_background = pygame.Rect(x, y, 65, 65)
+        cell_text = FONT_base.render('S', 1, Black)
+
+        pygame.draw.rect(mySurface, White, cell_background)
+        mySurface.blit(cell_text, (x + 15, y + 25))
+    elif board[i][j] == 2:
+        cell_background = pygame.Rect(x, y, 65, 65)
+        cell_text = FONT_base.render('O', 1, Black)
+
+        pygame.draw.rect(mySurface, White, cell_background)
+        mySurface.blit(cell_text, (x + 15, y + 25))
+
+    pygame.display.update()
+
+    return True
 
 def drawLines(mySurface, lines, player):
     """
