@@ -88,6 +88,9 @@ def drawBoard(mySurface, n):
     pygame.display.flip()
 
     return {
+        'newGame': NewGame,
+        'quitGame': QuitGame,
+        'mainMenu': GameMenu,
         'cells': cells
     }
 
@@ -149,17 +152,6 @@ def displayWinner(mySurface, n, scores):
     pass
 
 
-def selectSquare(mySurface, board, n):
-    """
-    Fait choisir une case et une lettre au joueur
-    :param mySurface: Surface pyGame
-    :param board: Tableau de jeu
-    :param n: Taille du tableau de jeu
-    :return: (i, j, l)
-    """
-    return 0, 0, 0
-
-
 def gamePlay(mySurface, board, n, scores):
     """
     Gère une partie SOS Complète
@@ -175,16 +167,6 @@ def gamePlay(mySurface, board, n, scores):
 
     rects = drawBoard(mySurface, n)
 
-    """
-    i, j, l = selectSquare(mySurface, board, n)
-    lines = []
-
-    drawCell(mySurface, board, i, j, player)
-    board, scores, lines = update(board, n, i, j, l, scores, player, lines)
-    drawLines(mySurface, lines, player)
-    displayScore(mySurface, n, scores)
-    """
-
     while playing:
 
         for event in pygame.event.get():
@@ -193,11 +175,36 @@ def gamePlay(mySurface, board, n, scores):
                 return 0
             elif event.type == pygame.MOUSEBUTTONDOWN:
 
-                for cell in rects['cells']:
-                    if cell['rect'].collidepoint(event.pos):
-                        print('Cell clicked at x ='+str(cell['x'])+' and y ='+str(cell['y']))
+                if rects['quitGame'].collidepoint(event.pos):
+                    return 0
+                elif rects['newGame'].collidepoint(event.pos):
+                    print('Not implemented!!') #TODO Implement new game
+                elif rects['mainMenu'].collidepoint(event.pos):
+                    return 1
+                else:
+
+                    for cell in rects['cells']:
+                        if cell['rect'].collidepoint(event.pos):
+
+                            if event.button == 1:
+                                l = 1
+                            elif event.button == 3:
+                                l = 2
+                            else:
+                                break
+
+                            i = cell['x']
+                            j = cell['y']
+
+                            lines = []
+
+                            drawCell(mySurface, board, i, j, player)
+                            board, scores, lines = update(board, n, i, j, l, scores, player, lines)
+                            drawLines(mySurface, lines, player)
+                            displayScore(mySurface, n, scores)
 
         clock.tick(60)
+    return 0
 
 
 def SOS(n):
