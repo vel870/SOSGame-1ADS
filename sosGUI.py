@@ -77,8 +77,8 @@ def drawBoard(mySurface, n):
             x = x + width  # Déplacement à droite
 
             cells.append({
-                'x': row,
-                'y': col,
+                'i': row,
+                'j': col,
                 'rect': cell_background
             })
 
@@ -128,23 +128,22 @@ def drawCell(mySurface, board, i, j, player):
     :param player: Joueur en cours
     :return: True si succès, False sinon
     """
-    x = 255 + 75 * i
-    y = 80 + 75 * j
+    x = 255 + 75 * j
+    y = 80 + 75 * i
 
     FONT_base = pygame.font.Font('freesansbold.ttf', 25)
 
     if board[i][j] == 1:
-        cell_background = pygame.Rect(x, y, 65, 65)
-        cell_text = FONT_base.render('S', 1, Black)
-
-        pygame.draw.rect(mySurface, White, cell_background)
-        mySurface.blit(cell_text, (x + 15, y + 25))
+        text = "S"
     elif board[i][j] == 2:
-        cell_background = pygame.Rect(x, y, 65, 65)
-        cell_text = FONT_base.render('O', 1, Black)
+        text = "O"
 
-        pygame.draw.rect(mySurface, White, cell_background)
-        mySurface.blit(cell_text, (x + 15, y + 25))
+    cell_background = pygame.Rect(x, y, 65, 65)
+    cell_text = FONT_base.render(text, 1, Black)
+
+    pygame.draw.rect(mySurface, White, cell_background)
+    mySurface.blit(cell_text, (x + 15, y + 25))
+
 
     pygame.display.update()
 
@@ -206,10 +205,10 @@ def gamePlay(mySurface, board, n, scores):
                     for cell in rects['cells']:
                         if cell['rect'].collidepoint(event.pos):
 
-                            i = cell['x']
-                            j = cell['y']
+                            i = cell['i']
+                            j = cell['j']
 
-                            if board[i][j] == 0:
+                            if possibleSquare(board, n, i, j):
 
                                 if event.button == 1:
                                     l = 1
@@ -221,7 +220,6 @@ def gamePlay(mySurface, board, n, scores):
                                 lines = []
 
                                 board, scores, lines = update(board, n, i, j, l, scores, player, lines)
-
                                 drawCell(mySurface, board, i, j, player)
                                 drawLines(mySurface, lines, player)
                                 displayScore(mySurface, n, scores)

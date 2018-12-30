@@ -9,7 +9,14 @@ def newBoard(n):
     :param n: Nombre de lignes et de colonnes du tableau de jeu
     :return: Tableau de jeu
     """
-    return [[0]*n]*n
+    board = []
+    for i in range(0, n):
+        board_line = []
+        for j in range(0, n):
+            board_line.append(0)
+
+        board.append(board_line)
+    return board
 
 
 def possibleSquare(board, n, i, j):
@@ -21,7 +28,7 @@ def possibleSquare(board, n, i, j):
     :param j: Colonne de la case
     :return: True | False
     """
-    if 0 < i < n and 0 < j < n:
+    if i in range(0, n) and j in range(0, n):
         if board[i][j] == 0:
             return True
         else:
@@ -129,10 +136,10 @@ def update(board, n, i, j, l, scores, player, lines):
     """
     board[i][j] = l
 
-    if l == 1:
-        scores, lines = updateScoreS(board, n, i, j, scores, player, lines)
-    else:
-        scores, lines = updateScoreO(board, n, i, j, scores, player, lines)
+    # if l == 1:
+        # scores, lines = updateScoreS(board, n, i, j, scores, player, lines)
+    # else:
+        # scores, lines = updateScoreO(board, n, i, j, scores, player, lines)
 
     return board, scores, lines
 
