@@ -1,32 +1,39 @@
 ########################
 # 1 ADS - MP 2 - SUPINFO
 ########################
-
 import pygame
-from pygame.locals import *
 
 from sosAlgorithms import *
 from sosLauncher import launcher
 
-WINDOW_width = 900
-WINDOW_height = 700
+# Options catalog
+options = {
+    'window' : {
+        'height' : 700,
+        'width'  : 900,
+    }
+}
 
-Black = (0, 0, 0)
-White = (255, 255, 255)
-Red = (255, 0, 0)
-Green = (0, 255, 0)
-Blue = (0, 0, 255)
-Blue0 = (36, 103, 141)
-Blue1 = (36, 48, 81)
-Blue2 = (194, 204, 231)
-Red0 = (206, 25, 25)
-Green0 = (49, 175, 73)
-Green1 = (173, 255, 0)
+# Colors Catalog
+colors = {
+    'black'      : (0, 0, 0),
+    'white'      : (255, 255, 255),
+    'grey'       : (179, 205, 224),
+    'red'        : (255, 0, 0),
+    'darkred'    : (206, 25, 25),
+    'blue'       : (0, 0, 255),
+    'darkblue' : (36, 48, 81),
+    'lightblue'  : (3, 146, 255),
+    'green'      : (0, 255, 0),
+}
 
 # Font Catalog
 # Fonts are defined in SOS(), as they can't be defined before PyGame init.
 fonts = {}
 
+# PyGame.rect List
+# Defines the surfaces that needs to be updated on a specific frame
+# (see end of gamePlay())
 updatedRects = []
 
 
@@ -39,7 +46,7 @@ def drawBoard(mySurface, n):
     """
     global updatedRects
 
-    mySurface.fill(Blue0)
+    mySurface.fill(colors['grey'])
 
     gamemenu_rect = pygame.Rect(50, 75, 180, 50)
     newgame_rect = pygame.Rect(50, 150, 180, 50)
@@ -48,29 +55,29 @@ def drawBoard(mySurface, n):
     ScoreP2 = pygame.Rect(50, 430, 180, 50)
     SaveGame = pygame.Rect(50, 545, 180, 50)
 
-    gamemenu_label = fonts['base'].render("Game Menu", 1, Blue2)
-    newgame_label = fonts['base'].render("New Game", 1, Blue2)
-    quit_label = fonts['base'].render("Quit Game", 1, Blue2)
-    score_p1_label = fonts['base'].render("P1 Score : ", 1, Blue2)
-    score_p2_label = fonts['base'].render("P2 Score : ", 1, Blue2)
-    SaveGame_label = fonts['base'].render("Save Game", 1, Blue2)
+    gamemenu_label = fonts['base'].render("Game Menu", 1, colors['darkblue'])
+    newgame_label = fonts['base'].render("New Game", 1, colors['darkblue'])
+    quit_label = fonts['base'].render("Quit Game", 1, colors['darkblue'])
+    score_p1_label = fonts['base'].render("P1 Score : ", 1, colors['blue'])
+    score_p2_label = fonts['base'].render("P2 Score : ", 1, colors['red'])
+    SaveGame_label = fonts['base'].render("Save Game", 1, colors['darkblue'])
 
-    pygame.draw.rect(mySurface, Blue1, gamemenu_rect)
+    pygame.draw.rect(mySurface, colors['lightblue'], gamemenu_rect)
     mySurface.blit(gamemenu_label, (60, 85))
 
-    pygame.draw.rect(mySurface, Blue1, newgame_rect)
+    pygame.draw.rect(mySurface, colors['lightblue'], newgame_rect)
     mySurface.blit(newgame_label, (65, 162))
 
-    pygame.draw.rect(mySurface, Blue1, quit_rect)
+    pygame.draw.rect(mySurface, colors['lightblue'], quit_rect)
     mySurface.blit(quit_label, (65, 237))
 
-    pygame.draw.rect(mySurface, Blue1, ScoreP1)
+    pygame.draw.rect(mySurface, colors['lightblue'], ScoreP1)
     mySurface.blit(score_p1_label, (65, 367))
 
-    pygame.draw.rect(mySurface, Blue1, ScoreP2)
+    pygame.draw.rect(mySurface, colors['lightblue'], ScoreP2)
     mySurface.blit(score_p2_label, (65, 442))
 
-    pygame.draw.rect(mySurface, Blue1, SaveGame)
+    pygame.draw.rect(mySurface, colors['lightblue'], SaveGame)
     mySurface.blit(SaveGame_label, (65, 557))
 
     width = 75
@@ -82,9 +89,9 @@ def drawBoard(mySurface, n):
         for col in range(0, n):
 
             cell_background = pygame.Rect(x, y, width, width)
-            cell_text = fonts['base'].render("S/O", 1, Red0)
+            cell_text = fonts['base'].render("S/O", 1, colors['darkred'])
 
-            pygame.draw.rect(mySurface, Blue1, cell_background, 5)
+            pygame.draw.rect(mySurface, colors['darkblue'], cell_background, 5)
             mySurface.blit(cell_text, (x + 15, y + 25))
 
             x = x + width  # Déplacement à droite
@@ -98,7 +105,7 @@ def drawBoard(mySurface, n):
         y = y + width  # Déplacement en bas
         x = 250  # Retour au côté gauche
 
-    updatedRects.append(pygame.Rect(0, 0, WINDOW_width, WINDOW_height))
+    updatedRects.append(pygame.Rect(0, 0, options['window']['width'], options['window']['height']))
 
     return {
         'newGame': newgame_rect,
@@ -118,13 +125,13 @@ def displayScore(mySurface, n, scores):
     """
     global updatedRects
 
-    score_player1_results = fonts['base'].render(str(scores[0]), 1, Blue2)
-    score_player2_results = fonts['base'].render(str(scores[1]), 1, Blue2)
+    score_player1_results = fonts['base'].render(str(scores[0]), 1, colors['darkblue'])
+    score_player2_results = fonts['base'].render(str(scores[1]), 1, colors['darkblue'])
 
-    mySurface.fill(Blue1, rect=score_player1_results.get_rect(topleft=(200, 367)))
+    mySurface.fill(colors['lightblue'], rect=score_player1_results.get_rect(topleft=(200, 367)))
     updatedRects.append(mySurface.blit(score_player1_results, (200, 367)))
 
-    mySurface.fill(Blue1, rect=score_player2_results.get_rect(topleft=(200, 442)))
+    mySurface.fill(colors['lightblue'], rect=score_player2_results.get_rect(topleft=(200, 442)))
     updatedRects.append(mySurface.blit(score_player2_results, (200, 442)))
 
     return True
@@ -140,10 +147,10 @@ def displayPlayer(mySurface, n, player):
     """
     global updatedRects
 
-    playerText = fonts['base'].render("C'est au joueur " + str(player + 1), 1, Blue2)
+    playerText = fonts['base'].render("C'est au joueur " + str(player + 1), 1, colors['darkblue'])
     playerTextRect = playerText.get_rect(topleft=(265, 635))
 
-    mySurface.fill(Blue0, rect=playerTextRect)
+    mySurface.fill(colors['grey'], rect=playerTextRect)
     mySurface.blit(playerText, (265, 635))
     updatedRects.append(playerTextRect)
 
@@ -168,12 +175,12 @@ def drawCell(mySurface, board, i, j, player):
     text = "S" if board[i][j] == 1 else "O"
 
     cell_background = pygame.Rect(x, y, 65, 65)
-    if text == "S":
-        cell_text = fonts['base'].render(text, 1, Blue)
+    if player == 0:
+        cell_text = fonts['base'].render(text, 1, colors['blue'])
     else:
-        cell_text = fonts['base'].render(text, 1, Red)
+        cell_text = fonts['base'].render(text, 1, colors['red'])
 
-    pygame.draw.rect(mySurface, White, cell_background)
+    pygame.draw.rect(mySurface, colors['white'], cell_background)
     mySurface.blit(cell_text, (x + 23, y + 22))
 
     updatedRects.append(cell_background)
@@ -198,9 +205,9 @@ def drawLines(mySurface, lines, player):
         x_stop = 285 + 75 * line[1][1]
         y_stop = 110 + 75 * line[1][0]
 
-        color = Blue1 if player == 1 else Green1
+        line_color = colors['blue'] if player == 0 else colors['red']
 
-        toUpdate.append(pygame.draw.aaline(mySurface, color, (x_start, y_start), (x_stop, y_stop)))
+        toUpdate.append(pygame.draw.aaline(mySurface, line_color, (x_start, y_start), (x_stop, y_stop)))
 
     updatedRects += toUpdate
 
@@ -215,8 +222,8 @@ def displayWinner(mySurface, n, scores):
     """
     global updatedRects
 
-    WhoWin = fonts['base'].render(str(winner(scores)), 1, Blue2)
-    updatedRects.append(mySurface.fill(Blue0, rect=WhoWin.get_rect(topleft=(265, 20))))
+    WhoWin = fonts['base'].render(str(winner(scores)), 1, colors['darkblue'])
+    updatedRects.append(mySurface.fill(colors['grey'], rect=WhoWin.get_rect(topleft=(265, 20))))
     updatedRects.append(mySurface.blit(WhoWin, (265, 20)))
 
     return True
@@ -311,7 +318,7 @@ def SOS(n):
     pygame.init()
     pygame.font.init()
 
-    mySurface = pygame.display.set_mode((WINDOW_width, WINDOW_height))
+    mySurface = pygame.display.set_mode((options['window']['width'], options['window']['height']))
     pygame.display.set_caption('SOS Game')
 
     fonts['base'] = pygame.font.Font('freesansbold.ttf', 25)
