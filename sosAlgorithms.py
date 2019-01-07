@@ -187,8 +187,8 @@ def winner(scores):
     :return: Chaîne de caractère indiquant le résultat de la partie
     """
     if scores[0] > scores[1]:
-        return " le joueur 1 a gagné ! "
+        return " Le joueur 1 a gagné ! "
     elif scores[0] < scores[1]:
-        return " le joueur 2 a gagné ! "
+        return " Le joueur 2 a gagné ! "
     else:
         return " Il y a égalité entre les joueurs ! "

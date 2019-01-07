@@ -37,10 +37,9 @@ def drawBoard(mySurface, n):
     gamemenu_rect = pygame.Rect(50, 75, 180, 50)
     newgame_rect = pygame.Rect(50, 150, 180, 50)
     quit_rect = pygame.Rect(50, 225, 180, 50)
-    ScoreP1 = pygame.Rect(50, 375, 180, 50)
-    ScoreP2 = pygame.Rect(50, 450, 180, 50)
-    SaveGame = pygame.Rect(265, 15, 180, 50)
-    Mode_Multijoueur = pygame.Rect(510, 15, 180, 50)
+    ScoreP1 = pygame.Rect(50, 355, 180, 50)
+    ScoreP2 = pygame.Rect(50, 430, 180, 50)
+    SaveGame = pygame.Rect(50, 545, 180, 50)
 
     gamemenu_label = FONT_base.render("Game Menu", 1, Blue2)
     newgame_label = FONT_base.render("New Game", 1, Blue2)
@@ -48,7 +47,6 @@ def drawBoard(mySurface, n):
     score_p1_label = FONT_base.render("P1 Score : ", 1, Blue2)
     score_p2_label = FONT_base.render("P2 Score : ", 1, Blue2)
     SaveGame_label = FONT_base.render("Save Game", 1, Blue2)
-    Mode_Multijoueur_label = FONT_base.render("Multiplayers", 1, Blue2)
 
     pygame.draw.rect(mySurface, Blue1, gamemenu_rect)
     mySurface.blit(gamemenu_label, (60, 85))
@@ -60,16 +58,13 @@ def drawBoard(mySurface, n):
     mySurface.blit(quit_label, (65, 237))
 
     pygame.draw.rect(mySurface, Blue1, ScoreP1)
-    mySurface.blit(score_p1_label, (65, 387))
+    mySurface.blit(score_p1_label, (65, 367))
 
     pygame.draw.rect(mySurface, Blue1, ScoreP2)
-    mySurface.blit(score_p2_label, (65, 462))
+    mySurface.blit(score_p2_label, (65, 442))
 
     pygame.draw.rect(mySurface, Blue1, SaveGame)
-    mySurface.blit(SaveGame_label, (275, 25))
-
-    pygame.draw.rect(mySurface, Blue1, Mode_Multijoueur)
-    mySurface.blit(Mode_Multijoueur_label, (520, 25))
+    mySurface.blit(SaveGame_label, (65, 557))
 
     width = 75
     x, y = 250, 75
@@ -115,14 +110,14 @@ def displayScore(mySurface, n, scores):
     """
     FONT_base = pygame.font.Font('freesansbold.ttf', 25)
 
-    score_player1_results = FONT_base.render(str(scores[0]), 1, Red)
-    score_player2_results = FONT_base.render(str(scores[1]), 1, Red)
+    score_player1_results = FONT_base.render(str(scores[0]), 1, Blue2)
+    score_player2_results = FONT_base.render(str(scores[1]), 1, Blue2)
 
-    mySurface.fill(Blue1, rect=score_player1_results.get_rect(topleft=(200, 387)))
-    mySurface.blit(score_player1_results, (200, 387))
+    mySurface.fill(Blue1, rect=score_player1_results.get_rect(topleft=(200, 367)))
+    mySurface.blit(score_player1_results, (200, 367))
 
-    mySurface.fill(Blue1, rect=score_player2_results.get_rect(topleft=(200, 462)))
-    mySurface.blit(score_player2_results, (200, 462))
+    mySurface.fill(Blue1, rect=score_player2_results.get_rect(topleft=(200, 442)))
+    mySurface.blit(score_player2_results, (200, 442))
 
     pygame.display.update()
 
@@ -137,7 +132,7 @@ def displayPlayer(mySurface, n, player):
     """
     FONT_base = pygame.font.Font('freesansbold.ttf', 25)
 
-    WhoPLaying = FONT_base.render("C'est au joueur " + str(player + 1), 1, Red)
+    WhoPLaying = FONT_base.render("C'est au joueur " + str(player + 1), 1, Blue2)
     mySurface.fill(Blue0, rect=WhoPLaying.get_rect(topleft=(265, 635)))
     mySurface.blit(WhoPLaying, (265, 635))
 
@@ -160,10 +155,13 @@ def drawCell(mySurface, board, i, j, player):
     text = "S" if board[i][j] == 1 else "O"
 
     cell_background = pygame.Rect(x, y, 65, 65)
-    cell_text = FONT_base.render(text, 1, Black)
+    if text == "S":
+        cell_text = FONT_base.render(text, 1, Blue)
+    else:
+        cell_text = FONT_base.render(text, 1, Red)
 
     pygame.draw.rect(mySurface, White, cell_background)
-    mySurface.blit(cell_text, (x + 15, y + 25))
+    mySurface.blit(cell_text, (x + 23, y + 22))
 
     return cell_background
 
@@ -202,9 +200,9 @@ def displayWinner(mySurface, n, scores):
     """
     FONT_base = pygame.font.Font('freesansbold.ttf', 25)
 
-    WhoWin = FONT_base.render("Le joueur " + str(scores) + " a gagné !", 1, Red)
-    mySurface.fill(Blue0, rect=WhoWin.get_rect(topleft=(510, 635)))
-    mySurface.blit(WhoWin, (510, 635))
+    WhoWin = FONT_base.render(str(winner(scores)), 1, Blue2)
+    mySurface.fill(Blue0, rect=WhoWin.get_rect(topleft=(265, 20)))
+    mySurface.blit(WhoWin, (265, 20))
 
 
 def gamePlay(mySurface, board, n, scores):
@@ -223,6 +221,9 @@ def gamePlay(mySurface, board, n, scores):
     rects_to_update, clickable_rects = drawBoard(mySurface, n)
 
     while playing:
+        if won(board):
+            displayWinner(mySurface, n, scores)
+            pygame.display.update()
 
         for event in pygame.event.get():
 
