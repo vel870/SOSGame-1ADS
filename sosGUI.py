@@ -382,10 +382,10 @@ def gamePlayIA(mySurface, board, n, scores):
                 i = random.randint(0, n)
                 j = random.randint(0, n)
                 while not possibleSquare(board, n, i, j):
-                    i = random.randint(0, n)
-                    j = random.randint(0, n)
+                    i = random.randint(0, n-1)
+                    j = random.randint(0, n-1)
 
-                l = random.randint(0, 3)
+                l = random.randint(1, 2)
                 board, scores, lines = update(board, n, i, j, l, scores, player, lines)
                 drawCell(mySurface, board, i, j, player)
                 player = 0
