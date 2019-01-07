@@ -27,14 +27,18 @@ Green1 = (173, 255, 0)
 # Fonts are defined in SOS(), as they can't be defined before PyGame init.
 fonts = {}
 
+updatedRects = []
+
 
 def drawBoard(mySurface, n):
     """
     Dessine le plateau initial
     :param mySurface: Surface pyGame
     :param n: Taille du tableau de jeu
-    :return: Objet PyGame.rect de la surface à mettre à jour, liste d'objets Pygame.Rect cliquables
+    :return: Liste d'objets Pygame.Rect cliquables
     """
+    global updatedRects
+
     mySurface.fill(Blue0)
 
     gamemenu_rect = pygame.Rect(50, 75, 180, 50)
@@ -94,7 +98,9 @@ def drawBoard(mySurface, n):
         y = y + width  # Déplacement en bas
         x = 250  # Retour au côté gauche
 
-    return pygame.Rect(0, 0, WINDOW_width, WINDOW_height), {
+    updatedRects.append(pygame.Rect(0, 0, WINDOW_width, WINDOW_height))
+
+    return {
         'newGame': newgame_rect,
         'quitGame': quit_rect,
         'mainMenu': gamemenu_rect,
@@ -108,18 +114,20 @@ def displayScore(mySurface, n, scores):
     :param mySurface: Surface pyGame
     :param n: Taille du tableau de jeu
     :param scores: Tableau des scores
-    :return: Liste d'objets PyGame.rect des surfaces à mettre à jour
+    :return: True si succès, False sinon
     """
+    global updatedRects
+
     score_player1_results = fonts['base'].render(str(scores[0]), 1, Blue2)
     score_player2_results = fonts['base'].render(str(scores[1]), 1, Blue2)
 
     mySurface.fill(Blue1, rect=score_player1_results.get_rect(topleft=(200, 367)))
-    mySurface.blit(score_player1_results, (200, 367))
+    updatedRects.append(mySurface.blit(score_player1_results, (200, 367)))
 
     mySurface.fill(Blue1, rect=score_player2_results.get_rect(topleft=(200, 442)))
-    mySurface.blit(score_player2_results, (200, 442))
+    updatedRects.append(mySurface.blit(score_player2_results, (200, 442)))
 
-    pygame.display.update()
+    return True
 
 
 def displayPlayer(mySurface, n, player):
@@ -128,11 +136,18 @@ def displayPlayer(mySurface, n, player):
     :param mySurface: Surface pyGame
     :param n: Taille du tableau de jeu
     :param player: Joueur en cours
-    :return: Liste d'objets PyGame.rect des surfaces à mettre à jour
+    :return: True si succès, False sinon
     """
-    WhoPLaying = fonts['base'].render("C'est au joueur " + str(player + 1), 1, Blue2)
-    mySurface.fill(Blue0, rect=WhoPLaying.get_rect(topleft=(265, 635)))
-    mySurface.blit(WhoPLaying, (265, 635))
+    global updatedRects
+
+    playerText = fonts['base'].render("C'est au joueur " + str(player + 1), 1, Blue2)
+    playerTextRect = playerText.get_rect(topleft=(265, 635))
+
+    mySurface.fill(Blue0, rect=playerTextRect)
+    mySurface.blit(playerText, (265, 635))
+    updatedRects.append(playerTextRect)
+
+    return True
 
 
 def drawCell(mySurface, board, i, j, player):
@@ -145,6 +160,8 @@ def drawCell(mySurface, board, i, j, player):
     :param player: Joueur en cours
     :return: Objet PyGame.rect de la surface à mettre à jour
     """
+    global updatedRects
+
     x = 255 + 75 * j
     y = 80 + 75 * i
 
@@ -159,7 +176,7 @@ def drawCell(mySurface, board, i, j, player):
     pygame.draw.rect(mySurface, White, cell_background)
     mySurface.blit(cell_text, (x + 23, y + 22))
 
-    return cell_background
+    updatedRects.append(cell_background)
 
 
 def drawLines(mySurface, lines, player):
@@ -170,6 +187,8 @@ def drawLines(mySurface, lines, player):
     :param player: Joueur en cours
     :return: Liste d'objets PyGame.rect des surfaces à mettre à jour
     """
+    global updatedRects
+
     toUpdate = []
 
     for line in lines:
@@ -183,7 +202,7 @@ def drawLines(mySurface, lines, player):
 
         toUpdate.append(pygame.draw.aaline(mySurface, color, (x_start, y_start), (x_stop, y_stop)))
 
-    return toUpdate
+    updatedRects += toUpdate
 
 
 def displayWinner(mySurface, n, scores):
@@ -194,9 +213,13 @@ def displayWinner(mySurface, n, scores):
     :param scores: Tableau des scores
     :return: True si succès, False sinon
     """
+    global updatedRects
+
     WhoWin = fonts['base'].render(str(winner(scores)), 1, Blue2)
-    mySurface.fill(Blue0, rect=WhoWin.get_rect(topleft=(265, 20)))
-    mySurface.blit(WhoWin, (265, 20))
+    updatedRects.append(mySurface.fill(Blue0, rect=WhoWin.get_rect(topleft=(265, 20))))
+    updatedRects.append(mySurface.blit(WhoWin, (265, 20)))
+
+    return True
 
 
 def gamePlay(mySurface, board, n, scores):
@@ -208,16 +231,20 @@ def gamePlay(mySurface, board, n, scores):
     :param scores: Tableau des scores
     :return: Nouveau gamestate
     """
+    global updatedRects
+
     playing = 1
     player = 0
     clock = pygame.time.Clock()
 
-    rects_to_update, clickable_rects = drawBoard(mySurface, n)
+    clickable_rects = drawBoard(mySurface, n)
 
     while playing:
+
         if won(board):
             displayWinner(mySurface, n, scores)
-            pygame.display.update()
+
+        displayPlayer(mySurface, n, player)
 
         for event in pygame.event.get():
 
@@ -253,22 +280,20 @@ def gamePlay(mySurface, board, n, scores):
                         board, scores, lines = update(board, n, cell['i'], cell['j'], l, scores, player, lines)
 
                         # Mise à jour de l'affichage
-                        rects_to_update.append(drawCell(mySurface, board, cell['i'], cell['j'], player))
-                        rects_to_update += drawLines(mySurface, lines, player)
+                        drawCell(mySurface, board, cell['i'], cell['j'], player)
+                        drawLines(mySurface, lines, player)
                         displayScore(mySurface, n, scores)
 
                         # Changement de joueur conditionnel
                         player = togglePlayer(player) if not lines else player
-                        displayPlayer(mySurface, n, player)
-
                         # On considère qu'on ne peut cliquer qu'une cellule à la fois, on sort du "for"
                         break
 
-        if rects_to_update:
-            # Si la variable rects_to_update n'est pas vide, on met à jour l'affichage en conséquence
+        if updatedRects:
+            # Si la variable updatedRects n'est pas vide, on met à jour l'affichage en conséquence
             # en faisant attention de ne mettre à jour que les parties de l'écran qui ont été modifiées
-            pygame.display.update(rects_to_update)
-            rects_to_update = []
+            pygame.display.update(updatedRects)
+            updatedRects = []
 
         clock.tick(60)
 
