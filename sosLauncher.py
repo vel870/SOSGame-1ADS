@@ -73,8 +73,7 @@ def launcher(mySurface):
                 if normalgame_button.collidepoint(event.pos):
                     return 2
                 elif dumbiagame_button.collidepoint(event.pos):
-                    #return 3
-                    pass
+                    return 3
                 elif hardiagame_button.collidepoint(event.pos):
                     #return 4
                     pass
