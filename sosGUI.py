@@ -18,7 +18,7 @@ options = {
 colors = {
     'black'      : (0, 0, 0),
     'white'      : (255, 255, 255),
-    'grey'       : (179, 205, 224),
+    'lightgrey'       : (179, 205, 224),
     'red'        : (255, 0, 0),
     'darkred'    : (206, 25, 25),
     'blue'       : (0, 0, 255),
@@ -46,13 +46,11 @@ def drawBoard(mySurface, n):
     """
     global updatedRects
 
-    mySurface.fill(colors['grey'])
+    mySurface.fill(colors['lightgrey'])
 
     gamemenu_rect = pygame.Rect(50, 75, 180, 50)
     newgame_rect = pygame.Rect(50, 150, 180, 50)
     quit_rect = pygame.Rect(50, 225, 180, 50)
-    ScoreP1 = pygame.Rect(50, 355, 180, 50)
-    ScoreP2 = pygame.Rect(50, 430, 180, 50)
     SaveGame = pygame.Rect(50, 545, 180, 50)
 
     gamemenu_label = fonts['base'].render("Game Menu", 1, colors['darkblue'])
@@ -71,10 +69,8 @@ def drawBoard(mySurface, n):
     pygame.draw.rect(mySurface, colors['lightblue'], quit_rect)
     mySurface.blit(quit_label, (65, 237))
 
-    pygame.draw.rect(mySurface, colors['lightblue'], ScoreP1)
     mySurface.blit(score_p1_label, (65, 367))
 
-    pygame.draw.rect(mySurface, colors['lightblue'], ScoreP2)
     mySurface.blit(score_p2_label, (65, 442))
 
     pygame.draw.rect(mySurface, colors['lightblue'], SaveGame)
@@ -128,10 +124,10 @@ def displayScore(mySurface, n, scores):
     score_player1_results = fonts['base'].render(str(scores[0]), 1, colors['darkblue'])
     score_player2_results = fonts['base'].render(str(scores[1]), 1, colors['darkblue'])
 
-    mySurface.fill(colors['lightblue'], rect=score_player1_results.get_rect(topleft=(200, 367)))
+    mySurface.fill(colors['lightgrey'], rect=score_player1_results.get_rect(topleft=(200, 367)))
     updatedRects.append(mySurface.blit(score_player1_results, (200, 367)))
 
-    mySurface.fill(colors['lightblue'], rect=score_player2_results.get_rect(topleft=(200, 442)))
+    mySurface.fill(colors['lightgrey'], rect=score_player2_results.get_rect(topleft=(200, 442)))
     updatedRects.append(mySurface.blit(score_player2_results, (200, 442)))
 
     return True
@@ -150,7 +146,7 @@ def displayPlayer(mySurface, n, player):
     playerText = fonts['base'].render("C'est au joueur " + str(player + 1), 1, colors['darkblue'])
     playerTextRect = playerText.get_rect(topleft=(265, 635))
 
-    mySurface.fill(colors['grey'], rect=playerTextRect)
+    mySurface.fill(colors['lightgrey'], rect=playerTextRect)
     mySurface.blit(playerText, (265, 635))
     updatedRects.append(playerTextRect)
 
@@ -223,7 +219,7 @@ def displayWinner(mySurface, n, scores):
     global updatedRects
 
     WhoWin = fonts['base'].render(str(winner(scores)), 1, colors['darkblue'])
-    updatedRects.append(mySurface.fill(colors['grey'], rect=WhoWin.get_rect(topleft=(265, 20))))
+    updatedRects.append(mySurface.fill(colors['lightgrey'], rect=WhoWin.get_rect(topleft=(265, 20))))
     updatedRects.append(mySurface.blit(WhoWin, (265, 20)))
 
     return True
@@ -252,6 +248,7 @@ def gamePlay(mySurface, board, n, scores):
             displayWinner(mySurface, n, scores)
 
         displayPlayer(mySurface, n, player)
+        displayScore(mySurface, n, scores)
 
         for event in pygame.event.get():
 
@@ -289,7 +286,6 @@ def gamePlay(mySurface, board, n, scores):
                         # Mise à jour de l'affichage
                         drawCell(mySurface, board, cell['i'], cell['j'], player)
                         drawLines(mySurface, lines, player)
-                        displayScore(mySurface, n, scores)
 
                         # Changement de joueur conditionnel
                         player = togglePlayer(player) if not lines else player
