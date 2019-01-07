@@ -6,7 +6,7 @@ import pygame
 from pygame.locals import *
 
 from sosAlgorithms import *
-from sosLauncher import *
+from sosLauncher import launcher
 
 WINDOW_width = 900
 WINDOW_height = 700
@@ -23,6 +23,11 @@ Red0 = (206, 25, 25)
 Green0 = (49, 175, 73)
 Green1 = (173, 255, 0)
 
+# Font Catalog
+# Fonts are defined in SOS(), as they can't be defined before PyGame init.
+fonts = {}
+
+
 def drawBoard(mySurface, n):
     """
     Dessine le plateau initial
@@ -30,8 +35,6 @@ def drawBoard(mySurface, n):
     :param n: Taille du tableau de jeu
     :return: Objet PyGame.rect de la surface à mettre à jour, liste d'objets Pygame.Rect cliquables
     """
-    FONT_base = pygame.font.Font('freesansbold.ttf', 25)
-
     mySurface.fill(Blue0)
 
     gamemenu_rect = pygame.Rect(50, 75, 180, 50)
@@ -41,12 +44,12 @@ def drawBoard(mySurface, n):
     ScoreP2 = pygame.Rect(50, 430, 180, 50)
     SaveGame = pygame.Rect(50, 545, 180, 50)
 
-    gamemenu_label = FONT_base.render("Game Menu", 1, Blue2)
-    newgame_label = FONT_base.render("New Game", 1, Blue2)
-    quit_label = FONT_base.render("Quit Game", 1, Blue2)
-    score_p1_label = FONT_base.render("P1 Score : ", 1, Blue2)
-    score_p2_label = FONT_base.render("P2 Score : ", 1, Blue2)
-    SaveGame_label = FONT_base.render("Save Game", 1, Blue2)
+    gamemenu_label = fonts['base'].render("Game Menu", 1, Blue2)
+    newgame_label = fonts['base'].render("New Game", 1, Blue2)
+    quit_label = fonts['base'].render("Quit Game", 1, Blue2)
+    score_p1_label = fonts['base'].render("P1 Score : ", 1, Blue2)
+    score_p2_label = fonts['base'].render("P2 Score : ", 1, Blue2)
+    SaveGame_label = fonts['base'].render("Save Game", 1, Blue2)
 
     pygame.draw.rect(mySurface, Blue1, gamemenu_rect)
     mySurface.blit(gamemenu_label, (60, 85))
@@ -75,7 +78,7 @@ def drawBoard(mySurface, n):
         for col in range(0, n):
 
             cell_background = pygame.Rect(x, y, width, width)
-            cell_text = FONT_base.render("S/O", 1, Red0)
+            cell_text = fonts['base'].render("S/O", 1, Red0)
 
             pygame.draw.rect(mySurface, Blue1, cell_background, 5)
             mySurface.blit(cell_text, (x + 15, y + 25))
@@ -99,7 +102,6 @@ def drawBoard(mySurface, n):
     }
 
 
-
 def displayScore(mySurface, n, scores):
     """
     Affiche le score des deux joueurs
@@ -108,10 +110,8 @@ def displayScore(mySurface, n, scores):
     :param scores: Tableau des scores
     :return: Liste d'objets PyGame.rect des surfaces à mettre à jour
     """
-    FONT_base = pygame.font.Font('freesansbold.ttf', 25)
-
-    score_player1_results = FONT_base.render(str(scores[0]), 1, Blue2)
-    score_player2_results = FONT_base.render(str(scores[1]), 1, Blue2)
+    score_player1_results = fonts['base'].render(str(scores[0]), 1, Blue2)
+    score_player2_results = fonts['base'].render(str(scores[1]), 1, Blue2)
 
     mySurface.fill(Blue1, rect=score_player1_results.get_rect(topleft=(200, 367)))
     mySurface.blit(score_player1_results, (200, 367))
@@ -130,9 +130,7 @@ def displayPlayer(mySurface, n, player):
     :param player: Joueur en cours
     :return: Liste d'objets PyGame.rect des surfaces à mettre à jour
     """
-    FONT_base = pygame.font.Font('freesansbold.ttf', 25)
-
-    WhoPLaying = FONT_base.render("C'est au joueur " + str(player + 1), 1, Blue2)
+    WhoPLaying = fonts['base'].render("C'est au joueur " + str(player + 1), 1, Blue2)
     mySurface.fill(Blue0, rect=WhoPLaying.get_rect(topleft=(265, 635)))
     mySurface.blit(WhoPLaying, (265, 635))
 
@@ -150,15 +148,13 @@ def drawCell(mySurface, board, i, j, player):
     x = 255 + 75 * j
     y = 80 + 75 * i
 
-    FONT_base = pygame.font.Font('freesansbold.ttf', 25)
-
     text = "S" if board[i][j] == 1 else "O"
 
     cell_background = pygame.Rect(x, y, 65, 65)
     if text == "S":
-        cell_text = FONT_base.render(text, 1, Blue)
+        cell_text = fonts['base'].render(text, 1, Blue)
     else:
-        cell_text = FONT_base.render(text, 1, Red)
+        cell_text = fonts['base'].render(text, 1, Red)
 
     pygame.draw.rect(mySurface, White, cell_background)
     mySurface.blit(cell_text, (x + 23, y + 22))
@@ -198,9 +194,7 @@ def displayWinner(mySurface, n, scores):
     :param scores: Tableau des scores
     :return: True si succès, False sinon
     """
-    FONT_base = pygame.font.Font('freesansbold.ttf', 25)
-
-    WhoWin = FONT_base.render(str(winner(scores)), 1, Blue2)
+    WhoWin = fonts['base'].render(str(winner(scores)), 1, Blue2)
     mySurface.fill(Blue0, rect=WhoWin.get_rect(topleft=(265, 20)))
     mySurface.blit(WhoWin, (265, 20))
 
@@ -295,6 +289,8 @@ def SOS(n):
     mySurface = pygame.display.set_mode((WINDOW_width, WINDOW_height))
     pygame.display.set_caption('SOS Game')
 
+    fonts['base'] = pygame.font.Font('freesansbold.ttf', 25)
+
     while game_state != 0:
 
         if game_state == 1:
@@ -306,6 +302,17 @@ def SOS(n):
             board = newBoard(n)
             scores = [0, 0]
             game_state = gamePlay(mySurface, board, n, scores)
+
+        elif game_state == 3:
+            # GameState 3 : Random IA Game
+            pass
+
+        elif game_state == 4:
+            # GameState 4 : Hard IA Game
+            pass
+
+        else:
+            game_state = 0
 
 
 SOS(7)
