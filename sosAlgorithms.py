@@ -68,16 +68,20 @@ def updateScoreS(board, n, i, j, scores, player, lines):
         [(i+2, j+2), (i+1, j+1)],
     ]
 
-    for cells in cellsToCheck:
+    for cell in cellsToCheck:
 
         # On vérifie si les coordonnées calculées sont sur le plateau
-        if isCellOnBoard(n, cells[0][0], cells[0][1]) and isCellOnBoard(n, cells[1][0], cells[1][1]):
+        if isCellOnBoard(n, cell[0][0], cell[0][1]) and isCellOnBoard(n, cell[1][0], cell[1][1]):
 
             # On incrémente le score si on a bien un S dans cells[0] et un O dans cells[1]
-            if board[cells[0][0]][cells[0][1]] == 1 and board[cells[1][0]][cells[1][1]] == 2:
+            if board[cell[0][0]][cell[0][1]] == 1 and board[cell[1][0]][cell[1][1]] == 2:
 
                 # On ajoute une ligne entre les deux "S"
-                lines.append([(i, j), cells[0]])
+                lines.append({
+                    'start' : (i, j),
+                    'end'   : cell[0],
+                    'player': player
+                })
                 scores[player] += 1
 
     return scores, lines
@@ -109,15 +113,19 @@ def updateScoreO(board, n, i, j, scores, player, lines):
         [(i-1, j+1), (i+1, j-1)]
     ]
 
-    for cells in cellsToCheck:
+    for cell in cellsToCheck:
 
         # On vérifie si les coordonnées calculées sont sur le plateau
-        if isCellOnBoard(n, cells[0][0], cells[0][1]) and isCellOnBoard(n, cells[1][0], cells[1][1]):
+        if isCellOnBoard(n, cell[0][0], cell[0][1]) and isCellOnBoard(n, cell[1][0], cell[1][1]):
 
             # On incrémente le score si les deux cases sont bien des S
-            if board[cells[0][0]][cells[0][1]] == 1 and board[cells[1][0]][cells[1][1]] == 1:
+            if board[cell[0][0]][cell[0][1]] == 1 and board[cell[1][0]][cell[1][1]] == 1:
 
-                lines.append(cells)
+                lines.append({
+                    'start' : cell[0],
+                    'end'   : cell[1],
+                    'player': player
+                })
                 scores[player] += 1
 
     return scores, lines

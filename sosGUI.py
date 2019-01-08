@@ -12,7 +12,8 @@ options = {
     'window' : {
         'height' : 700,
         'width'  : 900,
-    }
+    },
+    'savepath' : 'savegame.json'
 }
 
 # Colors Catalog
@@ -203,12 +204,11 @@ def drawCell(mySurface, board, i, j, player = -1):
     return cell_background
 
 
-def drawLines(mySurface, lines, player):
+def drawLines(mySurface, lines):
     """
     Dessine les nouvelles lignes contenues dans lines de la couleur de player
     :param mySurface: Surface pyGame
     :param lines: Tableau des nouvelles lignes
-    :param player: Joueur en cours
     :return: Liste d'objets PyGame.rect des surfaces à mettre à jour
     """
     global updatedRects
@@ -217,12 +217,12 @@ def drawLines(mySurface, lines, player):
 
     for line in lines:
 
-        x_start = 285 + 75 * line[0][1]
-        y_start = 110 + 75 * line[0][0]
-        x_stop = 285 + 75 * line[1][1]
-        y_stop = 110 + 75 * line[1][0]
+        x_start = 285 + 75 * line['start'][1]
+        y_start = 110 + 75 * line['start'][0]
+        x_stop = 285 + 75 * line['end'][1]
+        y_stop = 110 + 75 * line['end'][0]
 
-        line_color = colors['blue'] if player == 0 else colors['red']
+        line_color = colors['blue'] if line['player'] == 0 else colors['red']
 
         toUpdate.append(pygame.draw.line(mySurface, line_color, (x_start, y_start), (x_stop, y_stop), 3))
 
@@ -246,22 +246,56 @@ def displayWinner(mySurface, n, scores):
     return True
 
 
-def gamePlay(mySurface, board, n, scores):
+def saveGame(gamestate, player, board, cells, lines, scores):
+
+    writable_cells = []
+
+    for cell in cells:
+        cell.pop('rect')
+        writable_cells.append(cell)
+
+    data = {
+        'gamestate': gamestate,
+        'player': player,
+        'board': board,
+        'cells': writable_cells,
+        'lines': lines,
+        'scores': scores
+    }
+
+    saveData(data, options['savepath'])
+    return True
+
+
+def gamePlay(mySurface, board, n, scores, savedata = False):
     """
     Gère une partie SOS Complète
     :param mySurface: Surface pyGame
     :param board: Tableau de jeu
     :param n: Taille du tableau de jeu
     :param scores: Tableau des scores
+    :param savedata
     :return: Nouveau gamestate
     """
     global updatedRects
 
     playing = 1
-    player = 0
     clock = pygame.time.Clock()
 
-    clickable_rects = drawBoard(mySurface, n)
+    if not savedata:
+        player = 0
+        clickable_rects = drawBoard(mySurface, n, board)
+        all_lines = []
+
+    else:
+        player = savedata['player']
+        board = savedata['board']
+        scores = savedata['scores']
+        clickable_rects = drawBoard(mySurface, n, board, savedata['cells'])
+        all_lines = savedata['lines']
+        drawLines(mySurface, all_lines)
+
+
     displayPlayer(mySurface, n, player)
     displayScore(mySurface, n, scores)
 
@@ -290,7 +324,7 @@ def gamePlay(mySurface, board, n, scores):
 
                     elif clickable_rects['saveGame'].collidepoint(event.pos):
                         #TODO Dynamic gamestate
-                        saveGame(2, player, board, clickable_rects['cells'], scores)
+                        saveGame(2, player, board, clickable_rects['cells'], all_lines, scores)
                         return 1
 
                     else:
@@ -304,14 +338,15 @@ def gamePlay(mySurface, board, n, scores):
                                 continue
 
                             l = 1 if event.button == 1 else 2
-                            lines = []
 
                             # Mise à jour des données de jeu
-                            board, scores, lines = update(board, n, cell['i'], cell['j'], l, scores, player, lines)
+                            board, scores, lines = update(board, n, cell['i'], cell['j'], l, scores, player, [])
+                            cell['player'] = player
 
                             # Mise à jour de l'affichage
                             drawCell(mySurface, board, cell['i'], cell['j'], player)
-                            drawLines(mySurface, lines, player)
+                            drawLines(mySurface, lines)
+                            all_lines += lines
                             displayScore(mySurface, n, scores)
 
                             # Changement de joueur conditionnel
