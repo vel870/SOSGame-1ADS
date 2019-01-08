@@ -38,11 +38,13 @@ fonts = {}
 updatedRects = []
 
 
-def drawBoard(mySurface, n):
+def drawBoard(mySurface, n, board, cells = False):
     """
     Dessine le plateau initial
     :param mySurface: Surface pyGame
     :param n: Taille du tableau de jeu
+    :param board: Tableau de jeu
+    :param cells: Liste de cellules, optionnel, uniquement si chargement d'une partie enregistrée
     :return: Liste d'objets Pygame.Rect cliquables
     """
     global updatedRects
@@ -53,6 +55,7 @@ def drawBoard(mySurface, n):
     newgame_rect = pygame.Rect(50, 150, 180, 50)
     quit_rect = pygame.Rect(50, 225, 180, 50)
     savegame_rect = pygame.Rect(50, 545, 180, 50)
+    cellsbackground_rect = pygame.Rect(250, 70, 530, 530)
 
     gamemenu_label = fonts['base'].render("Game Menu", 1, colors['darkblue'])
     newgame_label = fonts['base'].render("New Game", 1, colors['darkblue'])
@@ -74,33 +77,34 @@ def drawBoard(mySurface, n):
 
     mySurface.blit(score_p2_label, (65, 442))
 
-    pygame.draw.rect(mySurface, colors['lightblue'], SaveGame)
-    mySurface.blit(SaveGame_label, (84, 557))
+    pygame.draw.rect(mySurface, colors['lightblue'], savegame_rect)
+    mySurface.blit(savegame_label, (84, 557))
 
-    width = 75
-    x, y = 250, 75
+    pygame.draw.rect(mySurface, colors['lightblue'], cellsbackground_rect)
 
-    cells = []
+    new_cells = []
 
-    for row in range(0, n):
-        for col in range(0, n):
+    if not cells:
 
-            cell_background = pygame.Rect(x, y, width, width)
-            cell_text = fonts['base'].render("S/O", 1, colors['darkred'])
+        for i in range(0, n):
+            for j in range(0, n):
 
-            pygame.draw.rect(mySurface, colors['darkblue'], cell_background, 5)
-            mySurface.blit(cell_text, (x + 20, y + 24))
+                new_cells.append({
+                    'i': i,
+                    'j': j,
+                    'player': -1,
+                    'rect': drawCell(mySurface, board, i, j, -1)
+                })
 
-            x = x + width  # Déplacement à droite
+    else:
 
-            cells.append({
-                'i': row,
-                'j': col,
-                'rect': cell_background
+        for cell in cells:
+            new_cells.append({
+                    'i': cell['i'],
+                    'j': cell['j'],
+                    'player' : -1,
+                    'rect' : drawCell(mySurface, board, cell['i'], cell['j'], cell['player'])
             })
-
-        y = y + width  # Déplacement en bas
-        x = 250  # Retour au côté gauche
 
     updatedRects.append(pygame.Rect(0, 0, options['window']['width'], options['window']['height']))
 
@@ -109,6 +113,7 @@ def drawBoard(mySurface, n):
         'quitGame': quit_rect,
         'mainMenu': gamemenu_rect,
         'saveGame': savegame_rect,
+        'cells': new_cells
     }
 
 
@@ -154,7 +159,7 @@ def displayPlayer(mySurface, n, player):
     return True
 
 
-def drawCell(mySurface, board, i, j, player):
+def drawCell(mySurface, board, i, j, player = -1):
     """
     Dessine le contenu de la case (i,j) de la couleur de player
     :param mySurface: Surface pyGame
@@ -162,25 +167,40 @@ def drawCell(mySurface, board, i, j, player):
     :param i: Ligne de la case
     :param j: Colonne de la case
     :param player: Joueur en cours
-    :return: Objet PyGame.rect de la surface à mettre à jour
+    :return: Objet PyGame.rect de la surface de la cellule
     """
     global updatedRects
 
     x = 255 + 75 * j
-    y = 80 + 75 * i
+    y = 75 + 75 * i
 
-    text = "S" if board[i][j] == 1 else "O"
-
-    cell_background = pygame.Rect(x, y, 65, 65)
-    if player == 0:
-        cell_text = fonts['base'].render(text, 1, colors['blue'])
+    if board[i][j] == 1:
+        text_str = "S"
+        text_pos = (x + 25, y + 18)
+    elif board[i][j] == 2:
+        text_str = "O"
+        text_pos = (x + 25, y + 18)
     else:
-        cell_text = fonts['base'].render(text, 1, colors['red'])
+        text_str = "S/O"
+        text_pos = (x + 20, y + 24)
+
+    if player == -1:
+        text_color = colors['darkblue']
+    elif player == 0:
+        text_color = colors['blue']
+    elif player == 1:
+        text_color = colors['red']
+    else:
+        text_color = colors['green'] # On ne devrait jamais être ici.
+
+    cell_background = pygame.Rect(x, y, 70, 70)
+    cell_text = fonts['base'].render(text_str, 1, text_color)
 
     pygame.draw.rect(mySurface, colors['white'], cell_background)
-    mySurface.blit(cell_text, (x + 25, y + 18))
+    mySurface.blit(cell_text, text_pos)
 
     updatedRects.append(cell_background)
+    return cell_background
 
 
 def drawLines(mySurface, lines, player):
