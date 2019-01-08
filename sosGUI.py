@@ -62,20 +62,20 @@ def drawBoard(mySurface, n):
     SaveGame_label = fonts['base'].render("Save Game", 1, colors['darkblue'])
 
     pygame.draw.rect(mySurface, colors['lightblue'], gamemenu_rect)
-    mySurface.blit(gamemenu_label, (60, 85))
+    mySurface.blit(gamemenu_label, (82, 85))
 
     pygame.draw.rect(mySurface, colors['lightblue'], newgame_rect)
-    mySurface.blit(newgame_label, (65, 162))
+    mySurface.blit(newgame_label, (89, 162))
 
     pygame.draw.rect(mySurface, colors['lightblue'], quit_rect)
-    mySurface.blit(quit_label, (65, 237))
+    mySurface.blit(quit_label, (92, 237))
 
     mySurface.blit(score_p1_label, (65, 367))
 
     mySurface.blit(score_p2_label, (65, 442))
 
     pygame.draw.rect(mySurface, colors['lightblue'], SaveGame)
-    mySurface.blit(SaveGame_label, (65, 557))
+    mySurface.blit(SaveGame_label, (84, 557))
 
     width = 75
     x, y = 250, 75
@@ -89,7 +89,7 @@ def drawBoard(mySurface, n):
             cell_text = fonts['base'].render("S/O", 1, colors['darkred'])
 
             pygame.draw.rect(mySurface, colors['darkblue'], cell_background, 5)
-            mySurface.blit(cell_text, (x + 15, y + 25))
+            mySurface.blit(cell_text, (x + 20, y + 24))
 
             x = x + width  # Déplacement à droite
 
@@ -178,7 +178,7 @@ def drawCell(mySurface, board, i, j, player):
         cell_text = fonts['base'].render(text, 1, colors['red'])
 
     pygame.draw.rect(mySurface, colors['white'], cell_background)
-    mySurface.blit(cell_text, (x + 23, y + 22))
+    mySurface.blit(cell_text, (x + 25, y + 18))
 
     updatedRects.append(cell_background)
 
@@ -415,7 +415,7 @@ def SOS(n):
     mySurface = pygame.display.set_mode((options['window']['width'], options['window']['height']))
     pygame.display.set_caption('SOS Game')
 
-    fonts['base'] = pygame.font.Font('arial.ttf', 25)
+    fonts['base'] = pygame.font.Font('assets/font2.otf', 25)
 
     while game_state != 0:
 

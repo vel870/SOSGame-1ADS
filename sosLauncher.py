@@ -15,8 +15,8 @@ def launcher(mySurface):
     playing = 1
     clock = pygame.time.Clock()
 
-    FONT_base = pygame.font.Font('freesansbold.ttf', 25)
-    FONT_small = pygame.font.Font('freesansbold.ttf', 15)
+    FONT_base = pygame.font.Font('assets/font2.otf', 25)
+    FONT_small = pygame.font.Font('assets/font2.otf', 15)
 
     image_logo = pygame.image.load('assets/logo.png')
 
@@ -52,14 +52,14 @@ def launcher(mySurface):
     pygame.draw.rect(mySurface, grey, loadgame_button)
     pygame.draw.rect(mySurface, blue, quitgame_button)
 
-    mySurface.blit(normalgame_text, (390, 365))
-    mySurface.blit(dumbiagame_text, (320, 425))
-    mySurface.blit(hardiagame_text, (340, 485))
-    mySurface.blit(multiplayergame_text, (380, 545))
-    mySurface.blit(loadgame_text, (340, 605))
-    mySurface.blit(quitgame_text, (495, 605))
+    mySurface.blit(normalgame_text, (405, 360))
+    mySurface.blit(dumbiagame_text, (355, 423))
+    mySurface.blit(hardiagame_text, (370, 482))
+    mySurface.blit(multiplayergame_text, (397, 540))
+    mySurface.blit(loadgame_text, (349, 600))
+    mySurface.blit(quitgame_text, (509, 600))
 
-    mySurface.blit(FONT_small.render("Credits: Swann Excoffon & Simon Van Accoleyen", 1, black), (530, 675))
+    mySurface.blit(FONT_small.render("Credits: Swann Excoffon & Simon Van Accoleyen", 1, black), (612, 675))
 
     pygame.display.flip()
 
