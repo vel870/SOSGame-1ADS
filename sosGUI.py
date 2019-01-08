@@ -52,14 +52,14 @@ def drawBoard(mySurface, n):
     gamemenu_rect = pygame.Rect(50, 75, 180, 50)
     newgame_rect = pygame.Rect(50, 150, 180, 50)
     quit_rect = pygame.Rect(50, 225, 180, 50)
-    SaveGame = pygame.Rect(50, 545, 180, 50)
+    savegame_rect = pygame.Rect(50, 545, 180, 50)
 
     gamemenu_label = fonts['base'].render("Game Menu", 1, colors['darkblue'])
     newgame_label = fonts['base'].render("New Game", 1, colors['darkblue'])
     quit_label = fonts['base'].render("Quit Game", 1, colors['darkblue'])
     score_p1_label = fonts['base'].render("P1 Score : ", 1, colors['blue'])
     score_p2_label = fonts['base'].render("P2 Score : ", 1, colors['red'])
-    SaveGame_label = fonts['base'].render("Save Game", 1, colors['darkblue'])
+    savegame_label = fonts['base'].render("Save Game", 1, colors['darkblue'])
 
     pygame.draw.rect(mySurface, colors['lightblue'], gamemenu_rect)
     mySurface.blit(gamemenu_label, (82, 85))
@@ -108,7 +108,7 @@ def drawBoard(mySurface, n):
         'newGame': newgame_rect,
         'quitGame': quit_rect,
         'mainMenu': gamemenu_rect,
-        'cells': cells
+        'saveGame': savegame_rect,
     }
 
 
@@ -268,6 +268,11 @@ def gamePlay(mySurface, board, n, scores):
                         # Nouveau game state : 1, retour au menu principal
                         return 1
 
+                    elif clickable_rects['saveGame'].collidepoint(event.pos):
+                        #TODO Dynamic gamestate
+                        saveGame(2, player, board, clickable_rects['cells'], scores)
+                        return 1
+
                     else:
 
                         for cell in clickable_rects['cells']:
@@ -425,6 +430,7 @@ def SOS(n):
     pygame.display.set_caption('SOS Game')
 
     fonts['base'] = pygame.font.Font('assets/font2.otf', 25)
+    savedata = False
 
     while game_state != 0:
 
@@ -436,7 +442,8 @@ def SOS(n):
             # GameState 2 : Normal Game
             board = newBoard(n)
             scores = [0, 0]
-            game_state = gamePlay(mySurface, board, n, scores)
+            game_state = gamePlay(mySurface, board, n, scores, savedata)
+            savedata = False
 
         elif game_state == 3:
             # GameState 3 : Random IA Game
@@ -447,6 +454,11 @@ def SOS(n):
         elif game_state == 4:
             # GameState 4 : Hard IA Game
             pass
+
+        elif game_state == 5:
+            # GameState 5 : Load Game
+            savedata = loadData(options['savepath'])
+            game_state = savedata['gamestate']
 
         else:
             game_state = 0
