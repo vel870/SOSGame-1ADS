@@ -204,7 +204,7 @@ def drawLines(mySurface, lines, player):
 
         line_color = colors['blue'] if player == 0 else colors['red']
 
-        toUpdate.append(pygame.draw.aaline(mySurface, line_color, (x_start, y_start), (x_stop, y_stop)))
+        toUpdate.append(pygame.draw.line(mySurface, line_color, (x_start, y_start), (x_stop, y_stop), 3))
 
     updatedRects += toUpdate
 
@@ -242,94 +242,15 @@ def gamePlay(mySurface, board, n, scores):
     clock = pygame.time.Clock()
 
     clickable_rects = drawBoard(mySurface, n)
+    displayPlayer(mySurface, n, player)
+    displayScore(mySurface, n, scores)
 
     while playing:
 
         if won(board):
             displayWinner(mySurface, n, scores)
 
-        displayPlayer(mySurface, n, player)
-        displayScore(mySurface, n, scores)
-
-        for event in pygame.event.get():
-
-            if event.type == pygame.QUIT:
-                return 0
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-
-                if clickable_rects['quitGame'].collidepoint(event.pos):
-                    # Nouveau game state : 0, fermeture de l'application
-                    return 0
-
-                elif clickable_rects['newGame'].collidepoint(event.pos):
-                    print('Not implemented!!')
-
-                elif clickable_rects['mainMenu'].collidepoint(event.pos):
-                    # Nouveau game state : 1, retour au menu principal
-                    return 1
-
-                else:
-
-                    for cell in clickable_rects['cells']:
-
-                        if not cell['rect'].collidepoint(event.pos):
-                            continue
-
-                        if not possibleSquare(board, n, cell['i'], cell['j']):
-                            continue
-
-                        l = 1 if event.button == 1 else 2
-                        lines = []
-
-                        # Mise à jour des données de jeu
-                        board, scores, lines = update(board, n, cell['i'], cell['j'], l, scores, player, lines)
-
-                        # Mise à jour de l'affichage
-                        drawCell(mySurface, board, cell['i'], cell['j'], player)
-                        drawLines(mySurface, lines, player)
-
-                        # Changement de joueur conditionnel
-                        player = togglePlayer(player) if not lines else player
-                        # On considère qu'on ne peut cliquer qu'une cellule à la fois, on sort du "for"
-                        break
-
-        if updatedRects:
-            # Si la variable updatedRects n'est pas vide, on met à jour l'affichage en conséquence
-            # en faisant attention de ne mettre à jour que les parties de l'écran qui ont été modifiées
-            pygame.display.update(updatedRects)
-            updatedRects = []
-
-        clock.tick(60)
-
-    return 1  # Nouveau game state : 1, retour au menu principal
-
-
-def gamePlayIA(mySurface, board, n, scores):
-    """
-    Gère une partie SOS Complète
-    :param mySurface: Surface pyGame
-    :param board: Tableau de jeu
-    :param n: Taille du tableau de jeu
-    :param scores: Tableau des scores
-    :return: Nouveau gamestate
-    """
-    global updatedRects
-
-    playing = 1
-    player = 0
-    clock = pygame.time.Clock()
-
-    clickable_rects = drawBoard(mySurface, n)
-
-    while playing:
-
-        if won(board):
-            displayWinner(mySurface, n, scores)
-
-        displayPlayer(mySurface, n, player)
-        displayScore(mySurface, n, scores)
-
-        if player == 0:
+        else:
             for event in pygame.event.get():
 
                 if event.type == pygame.QUIT:
@@ -366,29 +287,117 @@ def gamePlayIA(mySurface, board, n, scores):
                             # Mise à jour de l'affichage
                             drawCell(mySurface, board, cell['i'], cell['j'], player)
                             drawLines(mySurface, lines, player)
+                            displayScore(mySurface, n, scores)
 
                             # Changement de joueur conditionnel
                             player = togglePlayer(player) if not lines else player
+                            displayPlayer(mySurface, n, player)
 
-                        # On considère qu'on ne peut cliquer qu'une cellule à la fois, on sort du "for"
-                        break
+                            # On considère qu'on ne peut cliquer qu'une cellule à la fois, on sort du "for"
+                            break
+
+        if updatedRects:
+            # Si la variable updatedRects n'est pas vide, on met à jour l'affichage en conséquence
+            # en faisant attention de ne mettre à jour que les parties de l'écran qui ont été modifiées
+            pygame.display.update(updatedRects)
+            updatedRects = []
+
+        clock.tick(60)
+
+    return 1  # Nouveau game state : 1, retour au menu principal
+
+
+def gamePlayIA(mySurface, board, n, scores):
+    """
+    Gère une partie SOS Complète
+    :param mySurface: Surface pyGame
+    :param board: Tableau de jeu
+    :param n: Taille du tableau de jeu
+    :param scores: Tableau des scores
+    :return: Nouveau gamestate
+    """
+    global updatedRects
+
+    playing = 1
+    player = 0
+    clock = pygame.time.Clock()
+
+    clickable_rects = drawBoard(mySurface, n)
+    displayPlayer(mySurface, n, player)
+    displayScore(mySurface, n, scores)
+
+    while playing:
+
+        if won(board):
+            displayWinner(mySurface, n, scores)
 
         else:
-            for cell in clickable_rects['cells']:
 
-                if not cell['rect'].collidepoint(event.pos):
-                    continue
+            if player == 0:
+                for event in pygame.event.get():
 
-                i = random.randint(0, n)
-                j = random.randint(0, n)
-                while not possibleSquare(board, n, i, j):
-                    i = random.randint(0, n-1)
-                    j = random.randint(0, n-1)
+                    if event.type == pygame.QUIT:
+                        return 0
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
 
-                l = random.randint(1, 2)
-                board, scores, lines = update(board, n, i, j, l, scores, player, lines)
-                drawCell(mySurface, board, i, j, player)
-                player = 0
+                        if clickable_rects['quitGame'].collidepoint(event.pos):
+                            # Nouveau game state : 0, fermeture de l'application
+                            return 0
+
+                        elif clickable_rects['newGame'].collidepoint(event.pos):
+                            print('Not implemented!!')
+
+                        elif clickable_rects['mainMenu'].collidepoint(event.pos):
+                            # Nouveau game state : 1, retour au menu principal
+                            return 1
+
+                        else:
+
+                            for cell in clickable_rects['cells']:
+
+                                if not cell['rect'].collidepoint(event.pos):
+                                    continue
+
+                                if not possibleSquare(board, n, cell['i'], cell['j']):
+                                    continue
+
+                                l = 1 if event.button == 1 else 2
+                                lines = []
+
+                                # Mise à jour des données de jeu
+                                board, scores, lines = update(board, n, cell['i'], cell['j'], l, scores, player, lines)
+
+                                # Mise à jour de l'affichage
+                                drawCell(mySurface, board, cell['i'], cell['j'], player)
+                                drawLines(mySurface, lines, player)
+                                displayScore(mySurface, n, scores)
+
+                                # Changement de joueur conditionnel
+                                player = togglePlayer(player) if not lines else player
+                                displayPlayer(mySurface, n, player)
+
+                            # On considère qu'on ne peut cliquer qu'une cellule à la fois, on sort du "for"
+                            break
+
+            else:
+                for cell in clickable_rects['cells']:
+
+                    if not cell['rect'].collidepoint(event.pos):
+                        continue
+
+                    i = random.randint(0, n)
+                    j = random.randint(0, n)
+                    while not possibleSquare(board, n, i, j):
+                        i = random.randint(0, n-1)
+                        j = random.randint(0, n-1)
+
+                    l = random.randint(1, 2)
+                    board, scores, lines = update(board, n, i, j, l, scores, player, lines)
+                    drawCell(mySurface, board, i, j, player)
+                    displayScore(mySurface, n, scores)
+
+                    player = 0
+                    displayPlayer(mySurface, n, player)
 
         if updatedRects:
             # Si la variable updatedRects n'est pas vide, on met à jour l'affichage en conséquence
@@ -415,7 +424,7 @@ def SOS(n):
     mySurface = pygame.display.set_mode((options['window']['width'], options['window']['height']))
     pygame.display.set_caption('SOS Game')
 
-    fonts['base'] = pygame.font.Font('arial.ttf', 25)
+    fonts['base'] = pygame.font.Font('freesansbold.ttf', 25)
 
     while game_state != 0:
 

@@ -46,7 +46,7 @@ def launcher(mySurface):
     mySurface.blit(image_logo, ((mySurface.get_width() / 2) -300, 20))
 
     pygame.draw.rect(mySurface, blue, normalgame_button)
-    pygame.draw.rect(mySurface, grey, dumbiagame_button)
+    pygame.draw.rect(mySurface, blue, dumbiagame_button)
     pygame.draw.rect(mySurface, grey, hardiagame_button)
     pygame.draw.rect(mySurface, grey, multiplayergame_button)
     pygame.draw.rect(mySurface, grey, loadgame_button)
