@@ -1,6 +1,8 @@
 ########################
 # 1 ADS - MP 2 - SUPINFO
 ########################
+import json
+from pprint import pprint
 
 
 def newBoard(n):
@@ -192,3 +194,15 @@ def winner(scores):
         return " Le joueur 2 a gagné ! "
     else:
         return " Il y a égalité entre les joueurs ! "
+
+
+def saveData(data, path):
+
+    with open(path, 'w') as outfile:
+        json.dump(data, outfile)
+
+
+def loadData(path):
+
+    with open(path) as f:
+        return json.load(f)
