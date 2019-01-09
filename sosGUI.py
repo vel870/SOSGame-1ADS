@@ -81,18 +81,20 @@ def drawBoard(mySurface, n, board, cells = False):
     :param n: Taille du tableau de jeu
     :param board: Tableau de jeu
     :param cells: Liste de cellules, optionnel, uniquement si chargement d'une partie enregistrée
-    :return: Liste d'objets Pygame.Rect cliquables
+    :return: Dictionnaire d'objets pygame.Rect cliquables
     """
     global updatedRects
 
     mySurface.fill(colors['lightgrey'])
 
+    # Dessin des rectangles nécessaires au jeu
     gamemenu_rect = drawRect(mySurface, 50, 75, 180, 50, colors['lightblue'])
     newgame_rect = drawRect(mySurface, 50, 150, 180, 50, colors['lightblue'])
     quit_rect = drawRect(mySurface, 50, 225, 180, 50, colors['lightblue'])
     savegame_rect = drawRect(mySurface, 50, 545, 180, 50, colors['lightblue'])
-    drawRect(mySurface, 250, 70, 530, 530, colors['lightblue'])
+    cellsbackground_rect = drawRect(mySurface, 250, 70, 530, 530, colors['lightblue'])
 
+    # Ecriture des textes nécessaires au jeu
     drawText(mySurface, "Game Menu", 82, 85, fonts['base'], colors['darkblue'])
     drawText(mySurface, "New Game", 89, 162, fonts['base'], colors['darkblue'])
     drawText(mySurface, "Quit Game", 92, 237, fonts['base'], colors['darkblue'])
@@ -103,7 +105,7 @@ def drawBoard(mySurface, n, board, cells = False):
     new_cells = []
 
     if not cells:
-
+        # Génération de toutes les cellules à l'état par défaut (nouveau jeu)
         for i in range(0, n):
             for j in range(0, n):
 
@@ -113,9 +115,8 @@ def drawBoard(mySurface, n, board, cells = False):
                     'player': -1,
                     'rect': drawCell(mySurface, board, i, j, -1)
                 })
-
     else:
-
+        # Génération de toutes les cellules selon le contenu de la variable cells (chargement de sauvegarde)
         for cell in cells:
             new_cells.append({
                     'i': cell['i'],
@@ -124,7 +125,10 @@ def drawBoard(mySurface, n, board, cells = False):
                     'rect' : drawCell(mySurface, board, cell['i'], cell['j'], cell['player'])
             })
 
-    updatedRects.append(pygame.Rect(0, 0, options['window']['width'], options['window']['height']))
+    # Mise à jour de l'entièreté de l'écran (voir la fin de gamePlay())
+    updatedRects.append(
+        pygame.Rect(0, 0, options['window']['width'], options['window']['height'])
+    )
 
     return {
         'newGame': newgame_rect,
@@ -185,27 +189,39 @@ def drawCell(mySurface, board, i, j, player = -1):
     x = 255 + 75 * j
     y = 75 + 75 * i
 
-    if board[i][j] == 1:
-        text_str = "S"
-        text_pos = (x + 25, y + 18)
-    elif board[i][j] == 2:
-        text_str = "O"
-        text_pos = (x + 25, y + 18)
-    else:
-        text_str = "S/O"
-        text_pos = (x + 20, y + 24)
+    # Choix du texte en fonction de board[i][j]
+    # L'utilisation de dictionnaires ici sert simplement à éviter un longue chaîne de if...
+    celltext_dict = {
+        0: {
+            'text': 'S | 0',
+            'x': x + 14,
+            'y': y + 21,
+        },
+        1 : {
+            'text' : 'S',
+            'x' : x + 28,
+            'y' : y + 21,
+        },
+        2: {
+            'text': 'O',
+            'x': x + 28,
+            'y': y + 21,
+        },
+    }
+    celltext = celltext_dict[board[i][j]]
 
-    if player == -1:
-        text_color = colors['darkblue']
-    elif player == 0:
-        text_color = colors['blue']
-    elif player == 1:
-        text_color = colors['red']
-    else:
-        text_color = colors['green'] # On ne devrait jamais être ici.
+    # Choix de la couleur du texte en fonction de player
+    # Même remarque que plus haut.
+    cellcolor_dict = {
+        -1: colors['darkblue'],
+        0: colors['blue'],
+        1: colors['red']
+    }
+    cellcolor = cellcolor_dict[player]
 
+    # Dessin de la cellule
     cell_rect = drawRect(mySurface, x, y, 70, 70, colors['white'])
-    drawText(mySurface, text_str, text_pos[0], text_pos[1], fonts['base'], text_color)
+    drawText(mySurface, celltext['text'], celltext['x'], celltext['y'], fonts['base'], cellcolor)
 
     updatedRects.append(cell_rect)
     return cell_rect
@@ -217,11 +233,15 @@ def drawLines(mySurface, lines):
     :param mySurface: Surface pyGame
     :param lines: Tableau des nouvelles lignes
     :return: True si succès, False sinon
+    FIXME: Il semble que pygame.draw.line retourne un pygame.rect qui ne prends pas en compte l'épaisseur de la ligne
+           et donc ne permet pas de mettre à jour l'affichage correctement
     """
     global updatedRects
 
     for line in lines:
 
+        # Calcul des coordonnées des lignes
+        # FIXME: Recentrer les lignes
         x_start = 285 + 75 * line['start'][1]
         y_start = 110 + 75 * line['start'][0]
         x_stop = 285 + 75 * line['end'][1]
@@ -254,24 +274,37 @@ def displayWinner(mySurface, n, scores):
 
 
 def saveGame(gamestate, player, board, cells, lines, scores):
+    """
 
-    writable_cells = []
+    :param gamestate: Variable d'état de jeu
+    :param player: Joueur en cours
+    :param board: Tableau de jeu actuel
+    :param cells: Tableau des cellules
+    :param lines: Tableau des lignes
+    :param scores: Scores actuels
+    :return: True si succès, False sinon
+    FIXME : Enregsitrer une partie qui a été chargée d'une sauvegarde semble perdre des données
+    """
 
+    # On veut enregistrer les données de cellules sans leur valeur "pygame.Rect"
     for cell in cells:
         cell.pop('rect')
-        writable_cells.append(cell)
 
+    # Creation du dictionnaire de données à enregistrer complet
     data = {
         'gamestate': gamestate,
         'player': player,
         'board': board,
-        'cells': writable_cells,
+        'cells': cells,
         'lines': lines,
         'scores': scores
     }
 
-    saveData(data, options['savepath'])
-    return True
+    # Vérification du bon déroulement de la sauvegarde
+    if saveData(data, options['savepath']):
+        return True
+
+    return False
 
 
 def gamePlay(mySurface, board, n, scores, gamestate, savedata = False):
@@ -306,9 +339,9 @@ def gamePlay(mySurface, board, n, scores, gamestate, savedata = False):
         all_lines = savedata['lines']
         drawLines(mySurface, all_lines)
 
+    # Affichage du joueur et du score initiaux
     displayPlayer(mySurface, n, player)
     displayScore(mySurface, n, scores)
-
 
     while playing:
 
@@ -371,6 +404,8 @@ def gamePlay(mySurface, board, n, scores, gamestate, savedata = False):
                             break
 
         if cellChanged:
+            # ... Si un joueur ou une IA a choisi une case
+
             board, scores, lines = update(board, n, i, j, l, scores, player, [])
 
             # Mise à jour de l'affichage
@@ -391,13 +426,13 @@ def gamePlay(mySurface, board, n, scores, gamestate, savedata = False):
             updatedRects = []
 
         if won(board):
+            # Si on détecte la victoire
             displayWinner(mySurface, n, scores)
             pygame.display.update(updatedRects)
             sleep(5)
-            return 1
+            playing = False
 
-
-        clock.tick(60)
+        clock.tick(25)
 
     return 1  # Nouveau game state : 1, retour au menu principal
 
@@ -406,7 +441,7 @@ def SOS(n):
     """
     Crée une fenêtre graphique, initialise les structures de données et gère une partie complète.
     :param n: Taille du tableau de jeu
-    :return:
+    :return: True
     """
     game_state = 1
 
@@ -426,30 +461,31 @@ def SOS(n):
             game_state = launcher(mySurface)
 
         elif game_state == 2:
-            # GameState 2 : Normal Game
+            # GameState 2 : Jeu normal
             board = newBoard(n)
             scores = [0, 0]
             game_state = gamePlay(mySurface, board, n, scores, game_state, savedata)
             savedata = False
 
         elif game_state == 3:
-            # GameState 3 : Random IA Game
+            # GameState 3 : Jeu avec IA aléatoire (dumb_ai)
             board = newBoard(n)
             scores = [0, 0]
             game_state = gamePlay(mySurface, board, n, scores, game_state, savedata)
             savedata = False
 
         elif game_state == 4:
-            # GameState 4 : Hard IA Game
+            # GameState 4 : Jeu avec IA Intelligente (hard_ai)
             pass
 
         elif game_state == 5:
-            # GameState 5 : Load Game
+            # GameState 5 : Chargement du jeu
             savedata = loadData(options['savepath'])
             game_state = savedata['gamestate']
 
         else:
             game_state = 0
 
+    return True
 
 SOS(7)
