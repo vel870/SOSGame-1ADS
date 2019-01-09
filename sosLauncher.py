@@ -49,7 +49,7 @@ def launcher(mySurface):
     pygame.draw.rect(mySurface, blue, dumbiagame_button)
     pygame.draw.rect(mySurface, grey, hardiagame_button)
     pygame.draw.rect(mySurface, grey, multiplayergame_button)
-    pygame.draw.rect(mySurface, grey, loadgame_button)
+    pygame.draw.rect(mySurface, blue, loadgame_button)
     pygame.draw.rect(mySurface, blue, quitgame_button)
 
     mySurface.blit(normalgame_text, (405, 360))
@@ -70,19 +70,24 @@ def launcher(mySurface):
             if event.type == pygame.QUIT:
                 return 0
             elif event.type == pygame.MOUSEBUTTONDOWN:
+
                 if normalgame_button.collidepoint(event.pos):
                     return 2
+
                 elif dumbiagame_button.collidepoint(event.pos):
                     return 3
+
                 elif hardiagame_button.collidepoint(event.pos):
                     #return 4
                     pass
+
                 elif multiplayergame_button.collidepoint(event.pos):
                     #return 0
                     pass
+
                 elif loadgame_button.collidepoint(event.pos):
-                    #return 0
-                    pass
+                    return 5
+
                 elif quitgame_button.collidepoint(event.pos):
                     return 0
 
