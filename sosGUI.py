@@ -396,7 +396,9 @@ def gamePlay(mySurface, board, n, scores, gamestate, savedata = False):
 
                             i = cell['i']
                             j = cell['j']
-                            l = 1 if event.button == 1 else 2
+
+                            l = 1 if cell['rect'].centerx >= event.pos[0] else 2
+
                             cell['player'] = player
                             cellChanged = True
 
