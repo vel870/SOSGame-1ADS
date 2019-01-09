@@ -204,7 +204,7 @@ def drawCell(mySurface, board, i, j, player = -1):
         },
         2: {
             'text': 'O',
-            'x': x + 28,
+            'x': x + 29,
             'y': y + 21,
         },
     }
@@ -242,9 +242,9 @@ def drawLines(mySurface, lines):
 
         # Calcul des coordonnées des lignes
         # FIXME: Recentrer les lignes
-        x_start = 285 + 75 * line['start'][1]
+        x_start = 290 + 75 * line['start'][1]
         y_start = 110 + 75 * line['start'][0]
-        x_stop = 285 + 75 * line['end'][1]
+        x_stop = 290 + 75 * line['end'][1]
         y_stop = 110 + 75 * line['end'][0]
 
         line_color = colors['blue'] if line['player'] == 0 else colors['red']
