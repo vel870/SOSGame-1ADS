@@ -121,7 +121,7 @@ def drawBoard(mySurface, n, board, cells = False):
             new_cells.append({
                     'i': cell['i'],
                     'j': cell['j'],
-                    'player' : -1,
+                    'player' : cell['player'],
                     'rect' : drawCell(mySurface, board, cell['i'], cell['j'], cell['player'])
             })
 
@@ -275,7 +275,7 @@ def displayWinner(mySurface, n, scores):
 
 def saveGame(gamestate, player, board, cells, lines, scores):
     """
-
+    Enregistrement des données de jeu
     :param gamestate: Variable d'état de jeu
     :param player: Joueur en cours
     :param board: Tableau de jeu actuel
@@ -283,7 +283,6 @@ def saveGame(gamestate, player, board, cells, lines, scores):
     :param lines: Tableau des lignes
     :param scores: Scores actuels
     :return: True si succès, False sinon
-    FIXME : Enregsitrer une partie qui a été chargée d'une sauvegarde semble perdre des données
     """
 
     # On veut enregistrer les données de cellules sans leur valeur "pygame.Rect"
