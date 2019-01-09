@@ -2,7 +2,7 @@
 # 1 ADS - MP 2 - SUPINFO
 ########################
 import pygame
-import random
+from time import sleep
 
 from sosAlgorithms import *
 from sosLauncher import launcher
@@ -39,6 +39,41 @@ fonts = {}
 updatedRects = []
 
 
+def drawRect(mySurface, x, y, width, height, color):
+    """
+    Dessine un rectangle à l'écran
+    :param mySurface: pygame.Surface
+    :param x: coordonnée x du haut gauche du rectangle
+    :param y: coordonnée y du haut gauche du rectangle
+    :param width: Largeur du rectangle
+    :param height: Hauteur du rectangle
+    :param color:  Couleur de fond
+    :return: pygame.Rect
+    """
+    rect = pygame.Rect(x, y, width, height)
+    pygame.draw.rect(mySurface, color, rect)
+
+    return rect
+
+
+def drawText(mySurface, text, x, y, font, color, background = None):
+    """
+    Ecrit du texte à l'écran
+    :param mySurface: pygame.Surface
+    :param text: Texte à écrire
+    :param x: coordonnée x du haut gauche du texte
+    :param y: coordonnée y du haut gauche du texte
+    :param font: Police d'écriture
+    :param color: Couleur
+    :param background: (optionnel) Couleur de fond
+    :return: pygame.Rect
+    """
+    surface = font.render(text, 1, color, background)
+    rect = mySurface.blit(surface, (x, y))
+
+    return rect
+
+
 def drawBoard(mySurface, n, board, cells = False):
     """
     Dessine le plateau initial
@@ -52,36 +87,18 @@ def drawBoard(mySurface, n, board, cells = False):
 
     mySurface.fill(colors['lightgrey'])
 
-    gamemenu_rect = pygame.Rect(50, 75, 180, 50)
-    newgame_rect = pygame.Rect(50, 150, 180, 50)
-    quit_rect = pygame.Rect(50, 225, 180, 50)
-    savegame_rect = pygame.Rect(50, 545, 180, 50)
-    cellsbackground_rect = pygame.Rect(250, 70, 530, 530)
+    gamemenu_rect = drawRect(mySurface, 50, 75, 180, 50, colors['lightblue'])
+    newgame_rect = drawRect(mySurface, 50, 150, 180, 50, colors['lightblue'])
+    quit_rect = drawRect(mySurface, 50, 225, 180, 50, colors['lightblue'])
+    savegame_rect = drawRect(mySurface, 50, 545, 180, 50, colors['lightblue'])
+    drawRect(mySurface, 250, 70, 530, 530, colors['lightblue'])
 
-    gamemenu_label = fonts['base'].render("Game Menu", 1, colors['darkblue'])
-    newgame_label = fonts['base'].render("New Game", 1, colors['darkblue'])
-    quit_label = fonts['base'].render("Quit Game", 1, colors['darkblue'])
-    score_p1_label = fonts['base'].render("P1 Score : ", 1, colors['blue'])
-    score_p2_label = fonts['base'].render("P2 Score : ", 1, colors['red'])
-    savegame_label = fonts['base'].render("Save Game", 1, colors['darkblue'])
-
-    pygame.draw.rect(mySurface, colors['lightblue'], gamemenu_rect)
-    mySurface.blit(gamemenu_label, (82, 85))
-
-    pygame.draw.rect(mySurface, colors['lightblue'], newgame_rect)
-    mySurface.blit(newgame_label, (89, 162))
-
-    pygame.draw.rect(mySurface, colors['lightblue'], quit_rect)
-    mySurface.blit(quit_label, (92, 237))
-
-    mySurface.blit(score_p1_label, (65, 367))
-
-    mySurface.blit(score_p2_label, (65, 442))
-
-    pygame.draw.rect(mySurface, colors['lightblue'], savegame_rect)
-    mySurface.blit(savegame_label, (84, 557))
-
-    pygame.draw.rect(mySurface, colors['lightblue'], cellsbackground_rect)
+    drawText(mySurface, "Game Menu", 82, 85, fonts['base'], colors['darkblue'])
+    drawText(mySurface, "New Game", 89, 162, fonts['base'], colors['darkblue'])
+    drawText(mySurface, "Quit Game", 92, 237, fonts['base'], colors['darkblue'])
+    drawText(mySurface, "P1 Score :", 65, 367, fonts['base'], colors['blue'])
+    drawText(mySurface, "P2 Score :", 65, 442, fonts['base'], colors['red'])
+    drawText(mySurface, "Save Game", 84, 557, fonts['base'], colors['darkblue'])
 
     new_cells = []
 
@@ -128,14 +145,10 @@ def displayScore(mySurface, n, scores):
     """
     global updatedRects
 
-    score_player1_results = fonts['base'].render(str(scores[0]), 1, colors['darkblue'])
-    score_player2_results = fonts['base'].render(str(scores[1]), 1, colors['darkblue'])
-
-    mySurface.fill(colors['lightgrey'], rect=score_player1_results.get_rect(topleft=(200, 367)))
-    updatedRects.append(mySurface.blit(score_player1_results, (200, 367)))
-
-    mySurface.fill(colors['lightgrey'], rect=score_player2_results.get_rect(topleft=(200, 442)))
-    updatedRects.append(mySurface.blit(score_player2_results, (200, 442)))
+    updatedRects += [
+        drawText(mySurface, str(scores[0])+"  ", 200, 367, fonts['base'], colors['darkblue'], colors['lightgrey']),
+        drawText(mySurface, str(scores[1])+"  ", 200, 442, fonts['base'], colors['darkblue'], colors['lightgrey']),
+    ]
 
     return True
 
@@ -150,12 +163,9 @@ def displayPlayer(mySurface, n, player):
     """
     global updatedRects
 
-    playerText = fonts['base'].render("C'est au joueur " + str(player + 1), 1, colors['darkblue'])
-    playerTextRect = playerText.get_rect(topleft=(265, 635))
-
-    mySurface.fill(colors['lightgrey'], rect=playerTextRect)
-    mySurface.blit(playerText, (265, 635))
-    updatedRects.append(playerTextRect)
+    updatedRects.append(
+        drawText(mySurface, "C'est au joueur " + str(player + 1) + "   ", 265, 635, fonts['base'], colors['darkblue'], colors['lightgrey']),
+    )
 
     return True
 
@@ -194,14 +204,11 @@ def drawCell(mySurface, board, i, j, player = -1):
     else:
         text_color = colors['green'] # On ne devrait jamais être ici.
 
-    cell_background = pygame.Rect(x, y, 70, 70)
-    cell_text = fonts['base'].render(text_str, 1, text_color)
+    cell_rect = drawRect(mySurface, x, y, 70, 70, colors['white'])
+    drawText(mySurface, text_str, text_pos[0], text_pos[1], fonts['base'], text_color)
 
-    pygame.draw.rect(mySurface, colors['white'], cell_background)
-    mySurface.blit(cell_text, text_pos)
-
-    updatedRects.append(cell_background)
-    return cell_background
+    updatedRects.append(cell_rect)
+    return cell_rect
 
 
 def drawLines(mySurface, lines):
@@ -209,11 +216,9 @@ def drawLines(mySurface, lines):
     Dessine les nouvelles lignes contenues dans lines de la couleur de player
     :param mySurface: Surface pyGame
     :param lines: Tableau des nouvelles lignes
-    :return: Liste d'objets PyGame.rect des surfaces à mettre à jour
+    :return: True si succès, False sinon
     """
     global updatedRects
-
-    toUpdate = []
 
     for line in lines:
 
@@ -224,9 +229,11 @@ def drawLines(mySurface, lines):
 
         line_color = colors['blue'] if line['player'] == 0 else colors['red']
 
-        toUpdate.append(pygame.draw.line(mySurface, line_color, (x_start, y_start), (x_stop, y_stop), 3))
+        updatedRects.append(
+            pygame.draw.line(mySurface, line_color, (x_start, y_start), (x_stop, y_stop), 3)
+        )
 
-    updatedRects += toUpdate
+    return True
 
 
 def displayWinner(mySurface, n, scores):
@@ -239,9 +246,9 @@ def displayWinner(mySurface, n, scores):
     """
     global updatedRects
 
-    WhoWin = fonts['base'].render(str(winner(scores)), 1, colors['darkblue'])
-    updatedRects.append(mySurface.fill(colors['lightgrey'], rect=WhoWin.get_rect(topleft=(265, 20))))
-    updatedRects.append(mySurface.blit(WhoWin, (265, 20)))
+    updatedRects.append(
+        drawText(mySurface, str(winner(scores)), 265, 20, fonts['base'], colors['darkblue'], colors['lightgrey'])
+    )
 
     return True
 
@@ -267,27 +274,31 @@ def saveGame(gamestate, player, board, cells, lines, scores):
     return True
 
 
-def gamePlay(mySurface, board, n, scores, savedata = False):
+def gamePlay(mySurface, board, n, scores, gamestate, savedata = False):
     """
     Gère une partie SOS Complète
     :param mySurface: Surface pyGame
     :param board: Tableau de jeu
     :param n: Taille du tableau de jeu
     :param scores: Tableau des scores
-    :param savedata
+    :param gamestate: (int) Etat du jeu
+    :param savedata: Données de sauvegarde (optionnel)
     :return: Nouveau gamestate
     """
     global updatedRects
 
     playing = 1
+    cellChanged = False
     clock = pygame.time.Clock()
 
     if not savedata:
+        # Si savedata n'est pas initialisé, on charge une partie vide
         player = 0
         clickable_rects = drawBoard(mySurface, n, board)
         all_lines = []
 
     else:
+        # Sinon on met en place la partie sauvegardée précédemment
         player = savedata['player']
         board = savedata['board']
         scores = savedata['scores']
@@ -295,16 +306,26 @@ def gamePlay(mySurface, board, n, scores, savedata = False):
         all_lines = savedata['lines']
         drawLines(mySurface, all_lines)
 
-
     displayPlayer(mySurface, n, player)
     displayScore(mySurface, n, scores)
 
+
     while playing:
 
-        if won(board):
-            displayWinner(mySurface, n, scores)
+        if (gamestate == 3 or gamestate == 4) and player == 1:
+            # Tour d'une IA
+
+            i, j, l = playDumbAI(board, n)
+
+            for cell in clickable_rects['cells']:
+                if cell['i'] == i and cell['j'] == j:
+                    cell['player'] = 1
+                    break
+
+            cellChanged = True
 
         else:
+            # Tour d'un joueur réel
             for event in pygame.event.get():
 
                 if event.type == pygame.QUIT:
@@ -316,15 +337,18 @@ def gamePlay(mySurface, board, n, scores, savedata = False):
                         return 0
 
                     elif clickable_rects['newGame'].collidepoint(event.pos):
-                        print('Not implemented!!')
+                        # Initialisation d'une nouvelle partie du même type
+                        board = newBoard(n)
+                        scores = [0, 0]
+                        return gamePlay(mySurface, board, n, scores, gamestate, False)
 
                     elif clickable_rects['mainMenu'].collidepoint(event.pos):
                         # Nouveau game state : 1, retour au menu principal
                         return 1
 
                     elif clickable_rects['saveGame'].collidepoint(event.pos):
-                        #TODO Dynamic gamestate
-                        saveGame(2, player, board, clickable_rects['cells'], all_lines, scores)
+                        # Enregistrement des données de jeu sur le disque et retour au menu principal
+                        saveGame(gamestate, player, board, clickable_rects['cells'], all_lines, scores)
                         return 1
 
                     else:
@@ -337,133 +361,41 @@ def gamePlay(mySurface, board, n, scores, savedata = False):
                             if not possibleSquare(board, n, cell['i'], cell['j']):
                                 continue
 
+                            i = cell['i']
+                            j = cell['j']
                             l = 1 if event.button == 1 else 2
-
-                            # Mise à jour des données de jeu
-                            board, scores, lines = update(board, n, cell['i'], cell['j'], l, scores, player, [])
                             cell['player'] = player
-
-                            # Mise à jour de l'affichage
-                            drawCell(mySurface, board, cell['i'], cell['j'], player)
-                            drawLines(mySurface, lines)
-                            all_lines += lines
-                            displayScore(mySurface, n, scores)
-
-                            # Changement de joueur conditionnel
-                            player = togglePlayer(player) if not lines else player
-                            displayPlayer(mySurface, n, player)
+                            cellChanged = True
 
                             # On considère qu'on ne peut cliquer qu'une cellule à la fois, on sort du "for"
                             break
+
+        if cellChanged:
+            board, scores, lines = update(board, n, i, j, l, scores, player, [])
+
+            # Mise à jour de l'affichage
+            drawCell(mySurface, board, i, j, player)
+            drawLines(mySurface, lines)
+            all_lines += lines
+            displayScore(mySurface, n, scores)
+
+            # Changement de joueur conditionnel
+            player = togglePlayer(player) if not lines else player
+            displayPlayer(mySurface, n, player)
+            cellChanged = False
 
         if updatedRects:
             # Si la variable updatedRects n'est pas vide, on met à jour l'affichage en conséquence
             # en faisant attention de ne mettre à jour que les parties de l'écran qui ont été modifiées
             pygame.display.update(updatedRects)
             updatedRects = []
-
-        clock.tick(60)
-
-    return 1  # Nouveau game state : 1, retour au menu principal
-
-
-def gamePlayIA(mySurface, board, n, scores):
-    """
-    Gère une partie SOS Complète
-    :param mySurface: Surface pyGame
-    :param board: Tableau de jeu
-    :param n: Taille du tableau de jeu
-    :param scores: Tableau des scores
-    :return: Nouveau gamestate
-    """
-    global updatedRects
-
-    playing = 1
-    player = 0
-    clock = pygame.time.Clock()
-
-    clickable_rects = drawBoard(mySurface, n)
-    displayPlayer(mySurface, n, player)
-    displayScore(mySurface, n, scores)
-
-    while playing:
 
         if won(board):
             displayWinner(mySurface, n, scores)
-
-        else:
-
-            if player == 0:
-                for event in pygame.event.get():
-
-                    if event.type == pygame.QUIT:
-                        return 0
-                    elif event.type == pygame.MOUSEBUTTONDOWN:
-
-                        if clickable_rects['quitGame'].collidepoint(event.pos):
-                            # Nouveau game state : 0, fermeture de l'application
-                            return 0
-
-                        elif clickable_rects['newGame'].collidepoint(event.pos):
-                            print('Not implemented!!')
-
-                        elif clickable_rects['mainMenu'].collidepoint(event.pos):
-                            # Nouveau game state : 1, retour au menu principal
-                            return 1
-
-                        else:
-
-                            for cell in clickable_rects['cells']:
-
-                                if not cell['rect'].collidepoint(event.pos):
-                                    continue
-
-                                if not possibleSquare(board, n, cell['i'], cell['j']):
-                                    continue
-
-                                l = 1 if event.button == 1 else 2
-                                lines = []
-
-                                # Mise à jour des données de jeu
-                                board, scores, lines = update(board, n, cell['i'], cell['j'], l, scores, player, lines)
-
-                                # Mise à jour de l'affichage
-                                drawCell(mySurface, board, cell['i'], cell['j'], player)
-                                drawLines(mySurface, lines, player)
-                                displayScore(mySurface, n, scores)
-
-                                # Changement de joueur conditionnel
-                                player = togglePlayer(player) if not lines else player
-                                displayPlayer(mySurface, n, player)
-
-                            # On considère qu'on ne peut cliquer qu'une cellule à la fois, on sort du "for"
-                            break
-
-            else:
-                for cell in clickable_rects['cells']:
-
-                    if not cell['rect'].collidepoint(event.pos):
-                        continue
-
-                    i = random.randint(0, n)
-                    j = random.randint(0, n)
-                    while not possibleSquare(board, n, i, j):
-                        i = random.randint(0, n-1)
-                        j = random.randint(0, n-1)
-
-                    l = random.randint(1, 2)
-                    board, scores, lines = update(board, n, i, j, l, scores, player, lines)
-                    drawCell(mySurface, board, i, j, player)
-                    displayScore(mySurface, n, scores)
-
-                    player = 0
-                    displayPlayer(mySurface, n, player)
-
-        if updatedRects:
-            # Si la variable updatedRects n'est pas vide, on met à jour l'affichage en conséquence
-            # en faisant attention de ne mettre à jour que les parties de l'écran qui ont été modifiées
             pygame.display.update(updatedRects)
-            updatedRects = []
+            sleep(5)
+            return 1
+
 
         clock.tick(60)
 
@@ -497,14 +429,15 @@ def SOS(n):
             # GameState 2 : Normal Game
             board = newBoard(n)
             scores = [0, 0]
-            game_state = gamePlay(mySurface, board, n, scores, savedata)
+            game_state = gamePlay(mySurface, board, n, scores, game_state, savedata)
             savedata = False
 
         elif game_state == 3:
             # GameState 3 : Random IA Game
             board = newBoard(n)
             scores = [0, 0]
-            game_state = gamePlayIA(mySurface, board, n, scores)
+            game_state = gamePlay(mySurface, board, n, scores, game_state, savedata)
+            savedata = False
 
         elif game_state == 4:
             # GameState 4 : Hard IA Game

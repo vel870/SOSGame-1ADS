@@ -2,8 +2,7 @@
 # 1 ADS - MP 2 - SUPINFO
 ########################
 import json
-from pprint import pprint
-
+import random
 
 def newBoard(n):
     """
@@ -31,11 +30,10 @@ def possibleSquare(board, n, i, j):
     :param j: Colonne de la case
     :return: True | False
     """
-    if i in range(0, n) and j in range(0, n):
-        if board[i][j] == 0:
-            return True
-        else:
-            return False
+    if isCellOnBoard(n, i, j) and board[i][j] == 0:
+        return True
+
+    return False
 
 
 def updateScoreS(board, n, i, j, scores, player, lines):
@@ -85,7 +83,6 @@ def updateScoreS(board, n, i, j, scores, player, lines):
                 scores[player] += 1
 
     return scores, lines
-
 
 
 def updateScoreO(board, n, i, j, scores, player, lines):
@@ -184,7 +181,8 @@ def isCellOnBoard(n, i, j):
 
 def togglePlayer(player):
     """
-    Toggle player
+    Change le joueur actuel
+    TODO: marche seulement dans une configuration deux jouers classique
     :param player: actual player
     :return: new player
     """
@@ -204,13 +202,50 @@ def winner(scores):
         return " Il y a égalité entre les joueurs ! "
 
 
-def saveData(data, path):
+def playDumbAI(board, n):
+    """
+    Fait choisir une case à l'intelligence artificielle aléatoire
+    :param board: Tableau de jeu
+    :param n: Taille du tableau de jeu
+    :return: i, j, l
+    """
+    i = -1
+    j = -1
 
-    with open(path, 'w') as outfile:
-        json.dump(data, outfile)
+    while not possibleSquare(board, n, i, j):
+        i = random.randint(0, n - 1)
+        j = random.randint(0, n - 1)
+
+    l = random.randint(1, 2)
+
+    return i, j, l
+
+
+def saveData(data, path):
+    """
+    Enregistrement des données contenues dans "data" dans le fichier au chemin "path" au format json
+    :param data: Tableau de données Python
+    :param path: Chemin du fichier
+    :return:
+    """
+    try:
+        with open(path, 'w') as savefile:
+            json.dump(data, savefile)
+        return True
+
+    except Exception:
+        return False
 
 
 def loadData(path):
+    """
+    Chargement des données contenues dans la sauvegarde json dans le chemin "path"
+    :param path: Chemin du fichier de sauvegarde
+    :return: Données de sauvegarde, ou False
+    """
+    try:
+        with open(path) as savefile:
+            return json.load(savefile)
 
-    with open(path) as f:
-        return json.load(f)
+    except Exception:
+        return False
