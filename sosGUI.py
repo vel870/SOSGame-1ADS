@@ -241,7 +241,6 @@ def drawLines(mySurface, lines):
     for line in lines:
 
         # Calcul des coordonnées des lignes
-        # FIXME: Recentrer les lignes
         x_start = 290 + 75 * line['start'][1]
         y_start = 110 + 75 * line['start'][0]
         x_stop = 290 + 75 * line['end'][1]
@@ -449,8 +448,11 @@ def SOS(n):
     pygame.init()
     pygame.font.init()
 
+    image_icon = pygame.image.load('assets/icon.png')
+
     mySurface = pygame.display.set_mode((options['window']['width'], options['window']['height']))
     pygame.display.set_caption('SOS Game')
+    pygame.display.set_icon(image_icon)
 
     fonts['base'] = pygame.font.Font('assets/font2.otf', 25)
     savedata = False
