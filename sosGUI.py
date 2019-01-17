@@ -157,6 +157,25 @@ def displayScore(mySurface, n, scores):
     return True
 
 
+def drawArrow(mySurface, player):
+    """
+    Draw the arrow pointing to currently playing player
+    :param mySurface: Game surface
+    :param player: Current Player
+    :return:
+    """
+    if player == 0:
+        arrow = pygame.draw.aalines(mySurface, colors['blue'], 1, [[10, 385], [10, 375], [40, 380]])
+        previous = pygame.Rect(10, 450, 31, 11)
+    elif player == 1:
+        arrow = pygame.draw.aalines(mySurface, colors['red'], 1, [[10, 460], [10, 450], [40, 455]])
+        previous = pygame.Rect(10, 375, 31, 11)
+
+    pygame.draw.rect(mySurface, colors['lightgrey'], previous)
+    updatedRects.append(arrow)
+    updatedRects.append(previous)
+
+
 def displayPlayer(mySurface, n, player):
     """
     Affiche au joueur "player" que c'est son tour
@@ -170,6 +189,8 @@ def displayPlayer(mySurface, n, player):
     updatedRects.append(
         drawText(mySurface, "C'est au joueur " + str(player + 1) + "   ", 265, 635, fonts['base'], colors['darkblue'], colors['lightgrey']),
     )
+
+    drawArrow(mySurface, player),
 
     return True
 
