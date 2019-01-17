@@ -5,7 +5,6 @@ import pygame
 from time import sleep
 
 from sosAlgorithms import *
-from sosLauncher import launcher
 
 # Options catalog
 options = {
@@ -13,19 +12,21 @@ options = {
         'height' : 700,
         'width'  : 900,
     },
-    'savepath' : 'savegame.json'
+    'savepath' : 'savegame.json',
+    'n' : 7,
 }
 
 # Colors Catalog
 colors = {
     'black'      : (0, 0, 0),
     'white'      : (255, 255, 255),
-    'lightgrey'       : (179, 205, 224),
+    'lightgrey'  : (179, 205, 224),
     'red'        : (255, 0, 0),
     'darkred'    : (206, 25, 25),
     'blue'       : (0, 0, 255),
-    'darkblue' : (36, 48, 81),
+    'darkblue'   : (36, 48, 81),
     'lightblue'  : (3, 146, 255),
+    'lighterblue': (133, 214, 251),
     'green'      : (0, 255, 0),
 }
 
@@ -145,7 +146,6 @@ def displayScore(mySurface, n, scores):
     :param mySurface: Surface pyGame
     :param n: Taille du tableau de jeu
     :param scores: Tableau des scores
-    :return: True si succès, False sinon
     """
     global updatedRects
 
@@ -154,26 +154,28 @@ def displayScore(mySurface, n, scores):
         drawText(mySurface, str(scores[1])+"  ", 200, 442, fonts['base'], colors['darkblue'], colors['lightgrey']),
     ]
 
-    return True
-
 
 def drawArrow(mySurface, player):
     """
-    Draw the arrow pointing to currently playing player
-    :param mySurface: Game surface
-    :param player: Current Player
-    :return:
+    Dessine une flèche devant le joueur actuel
+    :param mySurface: Surface pyGame
+    :param player: Joueur en cours
     """
+    global updatedRects
+
     if player == 0:
         arrow = pygame.draw.aalines(mySurface, colors['blue'], 1, [[10, 385], [10, 375], [40, 380]])
         previous = pygame.Rect(10, 450, 31, 11)
-    elif player == 1:
+    else:
         arrow = pygame.draw.aalines(mySurface, colors['red'], 1, [[10, 460], [10, 450], [40, 455]])
         previous = pygame.Rect(10, 375, 31, 11)
 
     pygame.draw.rect(mySurface, colors['lightgrey'], previous)
-    updatedRects.append(arrow)
-    updatedRects.append(previous)
+
+    updatedRects += [
+        arrow,
+        previous
+    ]
 
 
 def displayPlayer(mySurface, n, player):
@@ -182,7 +184,6 @@ def displayPlayer(mySurface, n, player):
     :param mySurface: Surface pyGame
     :param n: Taille du tableau de jeu
     :param player: Joueur en cours
-    :return: True si succès, False sinon
     """
     global updatedRects
 
@@ -191,8 +192,6 @@ def displayPlayer(mySurface, n, player):
     )
 
     drawArrow(mySurface, player),
-
-    return True
 
 
 def drawCell(mySurface, board, i, j, player = -1):
@@ -214,7 +213,7 @@ def drawCell(mySurface, board, i, j, player = -1):
     # L'utilisation de dictionnaires ici sert simplement à éviter un longue chaîne de if...
     celltext_dict = {
         0: {
-            'text': 'S | 0',
+            'text': 'S | O',
             'x': x + 14,
             'y': y + 21,
         },
@@ -253,9 +252,6 @@ def drawLines(mySurface, lines):
     Dessine les nouvelles lignes contenues dans lines de la couleur de player
     :param mySurface: Surface pyGame
     :param lines: Tableau des nouvelles lignes
-    :return: True si succès, False sinon
-    FIXME: Il semble que pygame.draw.line retourne un pygame.rect qui ne prends pas en compte l'épaisseur de la ligne
-           et donc ne permet pas de mettre à jour l'affichage correctement
     """
     global updatedRects
 
@@ -273,8 +269,6 @@ def drawLines(mySurface, lines):
             pygame.draw.line(mySurface, line_color, (x_start, y_start), (x_stop, y_stop), 3)
         )
 
-    return True
-
 
 def displayWinner(mySurface, n, scores):
     """
@@ -282,15 +276,12 @@ def displayWinner(mySurface, n, scores):
     :param mySurface: Surface pyGame
     :param n: Taille du tableau de jeu
     :param scores: Tableau des scores
-    :return: True si succès, False sinon
     """
     global updatedRects
 
     updatedRects.append(
         drawText(mySurface, str(winner(scores)), 265, 20, fonts['base'], colors['darkblue'], colors['lightgrey'])
     )
-
-    return True
 
 
 def saveGame(gamestate, player, board, cells, lines, scores):
@@ -458,6 +449,73 @@ def gamePlay(mySurface, board, n, scores, gamestate, savedata = False):
     return 1  # Nouveau game state : 1, retour au menu principal
 
 
+def launcher(mySurface):
+    """
+    Affiche et gère le menu principal
+    :param mySurface: Surface pyGame
+    :return: Nouveau gamestate
+    """
+
+    clock = pygame.time.Clock()
+
+    mySurface.fill(colors['lightgrey'])
+
+    image_logo = pygame.image.load('assets/logo.png')
+    mySurface.blit(image_logo, ((mySurface.get_width() / 2) -300, 20))
+
+    # Dessin des boutons
+    normalgame_button = drawRect(mySurface, 300, 350, 300, 50, colors['lightblue'])
+    dumbiagame_button = drawRect(mySurface, 300, 410, 300, 50, colors['lightblue'])
+    hardiagame_button = drawRect(mySurface, 300, 470, 300, 50, colors['lighterblue'])
+    multiplayergame_button = drawRect(mySurface, 300, 530, 300, 50, colors['lighterblue'])
+    loadgame_button = drawRect(mySurface, 300, 590, 145, 50, colors['lightblue'])
+    quitgame_button = drawRect(mySurface, 455, 590, 145, 50, colors['lightblue'])
+
+    # Dessin du texte
+    drawText(mySurface, "2 Players", 405, 360, fonts['base'], colors['white'])
+    drawText(mySurface, "Player vs Random AI", 355, 423, fonts['base'], colors['white'])
+    drawText(mySurface, "Player vs Hard AI", 370, 482, fonts['base'], colors['white'])
+    drawText(mySurface, "Multiplayer", 397, 540, fonts['base'], colors['white'])
+    drawText(mySurface, "Load", 349, 600, fonts['base'], colors['white'])
+    drawText(mySurface, "Quit", 509, 600, fonts['base'], colors['white'])
+    drawText(mySurface, "Credits: Swann Excoffon & Simon Van Accoleyen", 612, 675, fonts['small'], colors['black'])
+
+    pygame.display.flip()
+
+    while True:
+
+        for event in pygame.event.get():
+
+            if event.type == pygame.QUIT:
+                return 0
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+
+                if normalgame_button.collidepoint(event.pos):
+                    return 2
+
+                elif dumbiagame_button.collidepoint(event.pos):
+                    return 3
+
+                elif hardiagame_button.collidepoint(event.pos):
+                    #return 4
+                    #Non implémenté
+                    pass
+
+                elif multiplayergame_button.collidepoint(event.pos):
+                    #return 0
+                    #Non implémenté
+                    pass
+
+                elif loadgame_button.collidepoint(event.pos):
+                    return 5
+
+                elif quitgame_button.collidepoint(event.pos):
+                    return 0
+
+        clock.tick(30)
+
+
 def SOS(n):
     """
     Crée une fenêtre graphique, initialise les structures de données et gère une partie complète.
@@ -476,6 +534,7 @@ def SOS(n):
     pygame.display.set_icon(image_icon)
 
     fonts['base'] = pygame.font.Font('assets/font2.otf', 25)
+    fonts['small'] = pygame.font.Font('assets/font2.otf', 15)
     savedata = False
 
     while game_state != 0:
@@ -512,4 +571,4 @@ def SOS(n):
 
     return True
 
-SOS(7)
+SOS(options['n'])
